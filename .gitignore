@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual Environment
+venv/
+
+# Database
+db.sqlite3
+
+# Media files / uploaded images
+media/
+
+# Static collected files
+static/
+
+# Environment variables
+.env
+
+# VS Code
+.vscode/
+
+# Excel/Data
+*.xlsx
+*.csv
+
+# ML Models
+models/
+*.pkl
+
+# Notebook file
+*.ipynb

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AirVision Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+      body 
+      { background: #f4f7fb; 
+        font-family: Arial, sans-serif; 
+      }
+      .navbar-modern 
+      { background: rgba(255,255,255,0.9); 
+        backdrop-filter: blur(10px); 
+        border-bottom: 1px solid #e2e8f0; 
+        padding: 12px 24px; 
+        position: sticky; 
+        top: 0; 
+        z-index: 1000; 
+      }
+      .brand 
+      { display: flex; 
+        align-items: center; 
+        gap: 10px; font-weight: 700; 
+        font-size: 25px; 
+        color: #1f2d3d; 
+        text-decoration: none; 
+      }
+      .search-box 
+      { position: relative; 
+        width: 250px; 
+      }
+      .search-box input 
+      { width: 100%; 
+        padding: 8px 35px 8px 12px; 
+        border-radius: 20px; 
+        border: 1px solid #dce3ea; 
+        outline: none; 
+        font-size: 14px; 
+      }
+      .search-icon { position: absolute; 
+        right: 10px; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        color: #6c757d; 
+        background: none; 
+        border: none; 
+        padding: 0; 
+        cursor: pointer; 
+      }
+      .hero 
+      { text-align: center; 
+        padding: 48px 20px 32px; 
+      }
+      .hero h2 
+      { font-size: 26px; 
+        font-weight: 700; 
+        color: #1f2d3d; 
+        margin-bottom: 8px; 
+      }
+      .hero p 
+      { color: #64748b; 
+        font-size: 15px; 
+      }
+      .section-label 
+      { font-size: 13px; 
+        font-weight: 600; 
+        color: #64748b; 
+        margin-bottom: 16px; 
+        text-transform: uppercase; 
+        letter-spacing: 0.5px; 
+      }
+      .aqi-card 
+      { background: #ffffff; 
+        border-radius: 14px; 
+        border: 1px solid #e2e8f0; 
+        padding: 24px 20px; 
+        text-align: center; 
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+        transition: transform 0.25s ease, box-shadow 0.25s ease; 
+      }
+      .aqi-card:hover 
+      { transform: translateY(-6px); 
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12); 
+      }
+      .card-city 
+      { font-size: 15px; 
+        font-weight: 600; 
+        color: #1f2d3d; 
+        margin-bottom: 10px; 
+      }
+      .card-aqi 
+      { font-size: 48px; 
+        font-weight: 700; 
+        line-height: 1; 
+        margin-bottom: 8px; 
+      }
+      .status-badge 
+      { display: inline-block; 
+        font-size: 13px; 
+        font-weight: 600; 
+        padding: 4px 14px; 
+        border-radius: 20px; 
+        margin-bottom: 18px; 
+      }
+      .status-good 
+      { color: #16a34a; 
+        background: #f0fdf4; 
+        border: 1px solid #bbf7d0; 
+      }
+      .status-moderate 
+      { color: #d97706; 
+        background: #fffbeb; 
+        border: 1px solid #fde68a; 
+      }
+      .status-unhealthy 
+      { color: #dc2626; 
+        background: #fff1f2; 
+        border: 1px solid #fecdd3; 
+      }
+      .aqi-good 
+      { color: #16a34a;
+      }
+      .aqi-moderate 
+      { color: #d97706; 
+      }
+      .aqi-unhealthy 
+      { color: #dc2626; 
+      }
+      .card-divider 
+      { border: none; 
+        border-top: 1px solid #e2e8f0; 
+        margin: 0 0 16px; 
+      }
+      .btn-forecast 
+      { display: block; 
+        width: 100%; 
+        padding: 9px; 
+        border-radius: 10px; 
+        border: none; 
+        background: #2563eb; 
+        color: #fff; 
+        font-size: 13px; 
+        font-weight: 600; 
+        text-decoration: none; 
+        text-align: center; 
+        transition: background 0.2s; }
+      .btn-forecast:hover 
+      { background: #1d4ed8; 
+      }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar-modern d-flex justify-content-between align-items-center">
+  <a href="/" class="brand">
+    <div style="display:flex; align-items:flex-end; gap:3px;">
+      <span style="display:block;width:5px;height:14px;border-radius:3px;background:#bfdbfe;"></span>
+      <span style="display:block;width:5px;height:20px;border-radius:3px;background:#93c5fd;"></span>
+      <span style="display:block;width:5px;height:28px;border-radius:3px;background:#2563eb;"></span>
+    </div>
+    AirVision
+  </a>
+  <div class="d-flex align-items-center gap-3">
+    <form method="GET" action="/search/" class="search-box" style="margin:0;">
+      <input name="city" list="districts" type="text" placeholder="Search district...">
+      <datalist id="districts">
+        {% for card in city_cards %}
+            <option value="{{ card.city }}"></option>
+        {% endfor %}
+      </datalist>
+      <button type="submit" class="search-icon"><i class="bi bi-search"></i></button>
+    </form>
+    <a href="/login/" class="btn btn-primary btn-sm">Login</a>
+    <a href="/register/" class="btn btn-primary btn-sm">Register</a>
+  </div>
+</nav>
+<!-- Hero -->
+<div class="hero">
+  <h2>Live Air Quality</h2>
+  <p>Real-time AQI data for major cities across Nepal</p>
+</div>
+<!-- AQI Cards -->
+<div class="container pb-5">
+  <div class="section-label">Live AQI Data</div>
+  <div class="row g-4">
+    {% for card in city_cards %}
+    <div class="col-md-3 col-sm-6">
+      <div class="aqi-card">
+        <div class="card-city">{{ card.city }}</div>
+        <div class="card-aqi aqi-{{ card.status_class }}">{{ card.aqi }}</div>
+        <div class="status-badge status-{{ card.status_class }}">{{ card.status }}</div>
+        <hr class="card-divider"/>
+        <div class="d-flex justify-content-center">
+          <a href="/forecast/{{ card.city|lower }}/" class="btn-forecast">7 Day Forecast</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

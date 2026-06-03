@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard - AirVision</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #f4f7fb;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar-modern {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 28px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 20px;
+            color: #1f2d3d;
+            text-decoration: none;
+        }
+
+        .admin-badge {
+            font-size: 11px;
+            font-weight: 700;
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+            border-radius: 20px;
+            padding: 2px 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .welcome-text { font-size: 14px; color: #64748b; }
+        .welcome-text strong { color: #1f2d3d; }
+
+        .btn-logout {
+            padding: 6px 16px;
+            border-radius: 7px;
+            border: 1.5px solid #e2e8f0;
+            background: transparent;
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+
+        .btn-logout:hover {
+            background: #fff1f2;
+            border-color: #fecdd3;
+            color: #dc2626;
+        }
+
+        /* Layout */
+        .layout { display: flex; flex: 1; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background: #ffffff;
+            border-right: 1px solid #e2e8f0;
+            padding: 24px 0;
+            flex-shrink: 0;
+            position: sticky;
+            top: 60px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+        }
+
+        .sidebar-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 20px;
+            margin-bottom: 6px;
+            margin-top: 20px;
+        }
+
+        .sidebar-label:first-child { margin-top: 0; }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
+            text-decoration: none;
+            transition: background 0.15s, color 0.15s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+        }
+
+        .sidebar-link:hover { background: #f4f7fb; color: #1f2d3d; }
+
+        .sidebar-link.active {
+            background: #eff6ff;
+            color: #2563eb;
+            font-weight: 600;
+            border-right: 3px solid #2563eb;
+        }
+
+        .sidebar-link i { font-size: 16px; width: 18px; }
+
+        /* Main */
+        .main-content { flex: 1; padding: 28px; overflow-y: auto; }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .section-header { margin-bottom: 24px; }
+        .section-header h2 { font-size: 20px; font-weight: 700; color: #1f2d3d; margin-bottom: 4px; }
+        .section-header p { font-size: 13px; color: #94a3b8; }
+
+        /* Cards */
+        .card-box {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            padding: 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .card-heading { font-size: 15px; font-weight: 700; color: #1f2d3d; margin-bottom: 4px; }
+        .card-sub { font-size: 13px; color: #94a3b8; margin-bottom: 18px; }
+        .card-divider { border: none; border-top: 1px solid #f1f5f9; margin: 16px 0; }
+
+        /* Stat cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            padding: 20px 22px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+
+        .stat-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            margin-bottom: 12px;
+        }
+
+        .icon-blue   { background: #eff6ff; color: #2563eb; }
+        .icon-green  { background: #f0fdf4; color: #16a34a; }
+        .icon-amber  { background: #fffbeb; color: #d97706; }
+        .icon-purple { background: #f5f3ff; color: #7c3aed; }
+
+        .stat-num {
+            font-size: 30px;
+            font-weight: 700;
+            color: #1f2d3d;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table th {
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 12px 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .data-table td {
+            padding: 12px 12px 12px 0;
+            border-bottom: 1px solid #f8fafc;
+            color: #1f2d3d;
+            vertical-align: middle;
+        }
+
+        .data-table tr:last-child td { border-bottom: none; }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .status-good      { color: #16a34a; background: #f0fdf4; border: 1px solid #bbf7d0; }
+        .status-moderate  { color: #d97706; background: #fffbeb; border: 1px solid #fde68a; }
+        .status-unhealthy { color: #dc2626; background: #fff1f2; border: 1px solid #fecdd3; }
+
+        .aqi-good      { color: #16a34a; }
+        .aqi-moderate  { color: #d97706; }
+        .aqi-unhealthy { color: #dc2626; }
+
+        /* Action buttons */
+        .btn-action {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: background 0.15s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-blue   { background: #eff6ff; color: #2563eb; }
+        .btn-blue:hover { background: #dbeafe; color: #2563eb; }
+
+        .btn-red    { background: #fff1f2; color: #dc2626; border: 1px solid #fecdd3; }
+        .btn-red:hover { background: #fee2e2; color: #dc2626; }
+
+        .btn-green  { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+        .btn-green:hover { background: #dcfce7; color: #16a34a; }
+
+        .btn-primary-solid {
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: none;
+            background: #2563eb;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary-solid:hover { background: #1d4ed8; color: #fff; }
+
+        /* Form inputs */
+        .form-label-sm {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 5px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 9px 14px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #1f2d3d;
+            outline: none;
+            margin-bottom: 14px;
+            background: #f8fafc;
+        }
+
+        .form-input:focus { border-color: #2563eb; background: #fff; }
+
+        /* Prediction log thumb */
+        .log-thumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.open { display: flex; }
+
+        .modal-box {
+            background: #fff;
+            border-radius: 14px;
+            padding: 24px;
+            max-width: 460px;
+            width: 90%;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .modal-close:hover { color: #dc2626; }
+
+        .modal-box img { width: 100%; border-radius: 10px; margin-bottom: 16px; }
+
+        .result-aqi { font-size: 52px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+
+        .health-box {
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 13px;
+            line-height: 1.6;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin-top: 14px;
+        }
+
+        .health-box i { font-size: 14px; flex-shrink: 0; margin-top: 2px; }
+        .health-unhealthy { background: #fff1f2; color: #dc2626; border: 1px solid #fecdd3; }
+        .health-moderate  { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+        .health-good      { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+
+        /* District AQI row */
+        .district-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .district-row:last-child { border-bottom: none; }
+
+        .district-name { font-size: 14px; font-weight: 600; color: #1f2d3d; }
+
+        /* Search filter */
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .filter-row input {
+            flex: 1;
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 13px;
+            outline: none;
+            background: #f8fafc;
+        }
+
+        .filter-row input:focus { border-color: #2563eb; background: #fff; }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar-modern">
+    <div class="d-flex align-items-center gap-3">
+        <a href="/" class="brand">
+            <div style="display:flex;align-items:flex-end;gap:3px;">
+                <span style="display:block;width:5px;height:14px;border-radius:3px;background:#bfdbfe;"></span>
+                <span style="display:block;width:5px;height:20px;border-radius:3px;background:#93c5fd;"></span>
+                <span style="display:block;width:5px;height:28px;border-radius:3px;background:#2563eb;"></span>
+            </div>
+            AirVision
+        </a>
+        
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+        <span class="welcome-text">Welcome, <strong>{{ user.username }}</strong></span>
+        <a href="{% url 'logout' %}" class="btn btn-primary">Logout</a>
+    </div>
+</nav>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-label">Overview</div>
+        <button class="sidebar-link active" onclick="showSection('overview', this)">
+            <i class="bi bi-grid"></i> Dashboard
+        </button>
+
+
+        <div class="sidebar-label">Manage</div>
+        <button class="sidebar-link" onclick="showSection('aqi-data', this)">
+            <i class="bi bi-database"></i> AQI Data
+        </button>
+        <button class="sidebar-link" onclick="showSection('models', this)">
+            <i class="bi bi-robot"></i> Model Predictions
+        </button>
+        <button class="sidebar-link" onclick="showSection('users', this)">
+            <i class="bi bi-people"></i> Users
+        </button>
+        <button class="sidebar-link" onclick="showSection('logs', this)">
+            <i class="bi bi-journal-text"></i> Prediction Logs
+        </button>
+    </aside>
+
+    <!-- Main -->
+    <div class="main-content">
+
+        <!-- ── OVERVIEW ── -->
+        <div class="section active" id="section-overview">
+            <div class="section-header">
+                <h2>Dashboard Overview</h2>
+                
+            </div>
+
+            <!-- Stat cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <!-- <div class="stat-icon icon-blue"><i class="bi bi-people-fill"></i></div> -->
+                    <div class="stat-num">{{ total_users }}</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <!-- <div class="stat-icon icon-green"><i class="bi bi-cpu-fill"></i></div> -->
+                    <div class="stat-num">{{ total_predictions }}</div>
+                    <div class="stat-label">Total Predictions</div>
+                </div>
+                <div class="stat-card">
+                    <!-- <div class="stat-icon icon-amber"><i class="bi bi-geo-alt-fill"></i></div> -->
+                    <div class="stat-num">{{ total_districts }}</div>
+                    <div class="stat-label">AQI Districts</div>
+                </div>
+                <div class="stat-card">
+                    <!-- <div class="stat-icon icon-purple"><i class="bi bi-images"></i></div> -->
+                    <div class="stat-num">{{ uploaded_images }}</div>
+                    <div class="stat-label">Uploaded Images</div>
+                </div>
+            </div>
+
+            <!-- District AQI Summary -->
+            <div class="card-box">
+                <div class="card-heading">District-wise AQI Summary</div>
+                
+
+                {% for item in district_data %}
+                <div class="district-row">
+                    <div class="district-name">{{ item.district }}</div>
+                    <div class="d-flex align-items-center gap-3">
+                        <span style="font-size:20px;font-weight:700;" class="aqi-{{ item.status|lower }}">{{ item.aqi }}</span>
+                        <span class="status-badge status-{{ item.status|lower }}">{{ item.status }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="district-row">
+                    <div class="district-name">No model districts available</div>
+                    <div class="d-flex align-items-center gap-3">
+                        <span style="font-size:14px;color:#64748b;">Please add a trained district or check model configuration.</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+<!-- ── AQI DATA (MANUAL RECORDS) ── -->
+<div class="section" id="section-aqi-data">
+    <div class="section-header">
+        <h2>Manual AQI Data</h2>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="card-box" style="border-color:#d1fae5;color:#166534;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card-box">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card-heading">Add new AQI record</div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <label class="form-label-sm">City</label>
+                    <input class="form-input" type="text" name="city" placeholder="Kathmandu" required>
+                    <label class="form-label-sm">Location</label>
+                    <input class="form-input" type="text" name="location" placeholder="Thamel, Patan, etc.">
+                    <label class="form-label-sm">AQI</label>
+                    <input class="form-input" type="number" name="aqi" min="0" placeholder="e.g. 110" required>
+                    <label class="form-label-sm">Status</label>
+                    <input class="form-input" type="text" name="status" placeholder="Moderate, Unhealthy" required>
+                    <label class="form-label-sm">Note</label>
+                    <textarea class="form-input" name="note" rows="3"></textarea>
+                    <button class="btn-primary-solid" type="submit">Save record</button>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <div class="card-heading">Manual AQI records</div>
+                <table class="data-table" style="margin-top:12px;">
+                    <thead>
+                        <tr>
+                            <th>City</th>
+                            <th>AQI</th>
+                            <th>Status</th>
+                            <th>Note</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in aqi_records %}
+                        <tr>
+                            <td><strong>{{ record.city }}</strong><br><small>{{ record.location }}</small></td>
+                            <td><span class="aqi-{{ record.status_class }}" style="font-weight:700;">{{ record.aqi }}</span></td>
+                            <td><span class="status-badge status-{{ record.status_class }}">{{ record.status }}</span></td>
+                            <td style="color:#64748b;">{{ record.note|default:'No note' }}</td>
+                            <td>
+                                <a href="/manual_aqi_delete/{{ record.id }}/" class="btn-action btn-red">
+                                    <i class="bi bi-trash me-1"></i>Delete
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" style="text-align:center;color:#94a3b8;">No manual AQI records added yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="section" id="section-models">
+    <div class="section-header">
+        <h2>Model Predictions</h2>
+        <p>Model-generated AQI predictions </p>
+    </div>
+    <!-- <div class="card-box" style="text-align:center;color:#64748b;"> -->
+        
+        <!-- <div>No model outputs available yet.</div>
+        <div style="margin-top:10px;">This section is reserved for trained model results and forecast details.</div> -->
+    <!-- </div> -->
+</div>
+
+        <!-- ── USERS ── -->
+<div class="section" id="section-users">
+    <div class="section-header">
+        <h2>Users</h2>
+        <p>Manage registered users</p>
+    </div>
+
+    <div class="card-box">
+
+        <table class="data-table" id="usersTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Predictions</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td style="color:#94a3b8;">{{ u.id }}</td>
+
+                    <td><strong>{{ u.username }}</strong></td>
+
+                    <td>
+                        {% if u.is_admin %}
+                            <span class="status-badge"
+                                  style="background:#fef3c7;color:#92400e;border:1px solid #fde68a;">
+                                Admin
+                            </span>
+                        {% else %}
+                            <span class="status-badge"
+                                  style="background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;">
+                                User
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>{{ u.prediction_count|default:"0" }}</td>
+
+                    <td>
+                        <a href="/users/delete/{{ u.id }}/"
+                           class="btn btn-primary"
+                           onclick="return confirm('Delete user {{ u.username }}?')">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align:center; color:#94a3b8;">
+                        No users found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<!-- ── PREDICTION LOGS ── -->
+<div class="section" id="section-logs">
+    <div class="section-header">
+        <h2>Prediction Logs</h2>
+        <p>User uploads and AI-generated AQI results</p>
+    </div>
+
+    <div class="card-box">
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>User</th>
+                    <th>AQI</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for log in prediction_logs %}
+                <tr>
+
+                    <!-- IMAGE -->
+                    <td>
+                        <img src="{{ log.image_url }}" class="log-thumb"
+                             onclick="openLogModal('{{ log.image_url }}','{{ log.aqi }}','{{ log.status }}','{{ log.status_class }}','{{ log.health_advice }}')">
+                    </td>
+
+                    <!-- USER -->
+                    <td><strong>{{ log.username }}</strong></td>
+
+                    <!-- AQI -->
+                    <td>
+                        <span class="aqi-{{ log.status_class }}" style="font-weight:700;">
+                            {{ log.aqi }}
+                        </span>
+                    </td>
+
+                    <!-- STATUS -->
+                    <td>
+                        <span class="status-badge status-{{ log.status_class }}">
+                            {{ log.status }}
+                        </span>
+                    </td>
+
+                    <!-- ACTION -->
+                    <td>
+                        <a href="/prediction_detail/{{ log.id }}/" class="btn-action btn-blue">
+                            <i class="bi bi-eye me-1"></i>View
+                        </a>
+                         <a href="/prediction_delete/{{ log.id }}/" class="btn-action btn-red">
+                            <i class="bi bi-trash me-1"></i>Delete
+                        </a>
+                    </td>
+
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align:center;color:#94a3b8;">
+                        No prediction logs found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+
+<script>
+    function showSection(name, btn) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+        document.getElementById('section-' + name).classList.add('active');
+        if (btn) btn.classList.add('active');
+    }
+
+    // Real dates for sample rows
+    document.querySelectorAll('.auto-date').forEach(function(el) {
+        var offset = parseInt(el.getAttribute('data-offset') || '0');
+        var d = new Date();
+        d.setDate(d.getDate() - offset);
+        el.textContent = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    });
+
+    // Modal
+    function openLogModal(imgUrl, aqi, status, statusClass, advice) {
+        document.getElementById('modal-img').src = imgUrl;
+        var aqiEl = document.getElementById('modal-aqi');
+        aqiEl.textContent = aqi;
+        aqiEl.className = 'result-aqi aqi-' + statusClass;
+        var badge = document.getElementById('modal-badge');
+        badge.textContent = status;
+        badge.className = 'status-badge status-' + statusClass;
+        var icons = { unhealthy: 'exclamation-triangle-fill', moderate: 'exclamation-circle-fill', good: 'check-circle-fill' };
+        var health = document.getElementById('modal-health');
+        health.className = 'health-box health-' + statusClass;
+        health.innerHTML = '<i class="bi bi-' + (icons[statusClass] || 'info-circle-fill') + '"></i><div><strong>Health Advice:</strong> ' + advice + '</div>';
+        document.getElementById('logModal').classList.add('open');
+    }
+
+    function closeModal() {
+        document.getElementById('logModal').classList.remove('open');
+    }
+
+    document.getElementById('logModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    // User search filter
+    function filterUsers() {
+        var q = document.getElementById('userSearch').value.toLowerCase();
+        document.querySelectorAll('#usersTable tbody tr').forEach(function(row) {
+            row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+    }
+</script>
+
+</body>
+</html>

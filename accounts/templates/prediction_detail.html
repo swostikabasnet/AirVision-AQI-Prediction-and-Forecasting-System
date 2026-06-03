@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prediction Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background:#f4f7fb; font-family: Arial, sans-serif; padding:40px; }
+        .card { max-width:660px; margin:auto; padding:28px; border-radius:14px; background:white; border:1px solid #e2e8f0; }
+        .aqi { font-size:48px; font-weight:700; margin-bottom:12px; }
+        .status { display:inline-block; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:600; margin-bottom:16px; }
+        .good { background:#f0fdf4; color:#16a34a; }
+        .moderate { background:#fffbeb; color:#d97706; }
+        .unhealthy { background:#fff1f2; color:#dc2626; }
+        img { width:100%; border-radius:12px; margin-bottom:18px; }
+        .btn-back { color:#2563eb; text-decoration:none; font-weight:600; }
+    </style>
+</head>
+<body>
+<div class="card">
+    {% if prediction.image %}
+    <img src="{{ prediction.image.url }}" alt="Prediction image">
+    {% endif %}
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
+        <div>
+            <div class="aqi">{{ prediction.predicted_aqi }}</div>
+            <div class="status {{ status_class }}">{{ prediction.status }}</div>
+        </div>
+        <div style="text-align:right; color:#64748b; font-size:13px;">{{ prediction.created_at|date:"M d, Y h:i A" }}</div>
+    </div>
+    <div style="font-size:14px; color:#64748b; margin-bottom:14px;">
+        <strong>Health Advice:</strong> {{ advice }}
+        {% if prediction.pm25 is not None %}
+            <br><strong>PM2.5:</strong> {{ prediction.pm25 }} µg/m³
+        {% endif %}
+    </div>
+    <hr style="border-color:#e2e8f0; margin:22px 0;">
+    {% if user_is_admin %}
+        <a href="/myadmin/" class="btn-back">← Back to Admin Dashboard</a>
+    {% else %}
+        <a href="/user/" class="btn-back">← Back to Dashboard</a>
+    {% endif %}
+</div>
+</body>
+</html>

@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Dashboard - AirVision</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #f4f7fb;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .navbar-modern {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 28px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 20px;
+            color: #1f2d3d;
+            text-decoration: none;
+        }
+
+        .welcome-text { font-size: 14px; color: #64748b; }
+        .welcome-text strong { color: #1f2d3d; }
+
+        .btn-logout {
+            padding: 6px 16px;
+            border-radius: 7px;
+            border: 1.5px solid #e2e8f0;
+            background: transparent;
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+
+        .btn-logout:hover {
+            background: #fff1f2;
+            border-color: #fecdd3;
+            color: #dc2626;
+        }
+
+        .layout { display: flex; flex: 1; }
+
+        .sidebar {
+            width: 220px;
+            background: #ffffff;
+            border-right: 1px solid #e2e8f0;
+            padding: 24px 0;
+            flex-shrink: 0;
+            position: sticky;
+            top: 60px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+        }
+
+        .sidebar-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 20px;
+            margin-bottom: 6px;
+            margin-top: 20px;
+        }
+
+        .sidebar-label:first-child { margin-top: 0; }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
+            text-decoration: none;
+            transition: background 0.15s, color 0.15s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+        }
+
+        .sidebar-link:hover { background: #f4f7fb; color: #1f2d3d; }
+
+        .sidebar-link.active {
+            background: #eff6ff;
+            color: #2563eb;
+            font-weight: 600;
+            border-right: 3px solid #2563eb;
+        }
+
+        .sidebar-link i { font-size: 16px; width: 18px; }
+
+        .main-content { flex: 1; padding: 28px; overflow-y: auto; }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .section-header { margin-bottom: 24px; }
+        .section-header h2 { font-size: 20px; font-weight: 700; color: #1f2d3d; margin-bottom: 4px; }
+        .section-header p { font-size: 13px; color: #94a3b8; }
+
+        .card-box {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            padding: 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .card-heading { font-size: 15px; font-weight: 700; color: #1f2d3d; margin-bottom: 4px; }
+        .card-sub { font-size: 13px; color: #94a3b8; margin-bottom: 18px; }
+
+        .upload-wrapper { position: relative; }
+
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 32px 20px;
+            text-align: center;
+            background: #f8fafc;
+            transition: border-color 0.2s, background 0.2s;
+            cursor: pointer;
+            display: block;
+        }
+
+        .upload-area:hover { border-color: #2563eb; background: #eff6ff; }
+        .upload-area i { font-size: 30px; color: #94a3b8; margin-bottom: 10px; display: block; }
+        .upload-area p { font-size: 13px; color: #64748b; margin: 0; }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .btn-predict {
+            width: 100%;
+            padding: 11px;
+            border-radius: 9px;
+            border: none;
+            background: #2563eb;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+            margin-top: 12px;
+        }
+
+        .btn-predict:hover { background: #1d4ed8; }
+
+        .result-aqi { font-size: 60px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+        .aqi-good      { color: #16a34a; }
+        .aqi-moderate  { color: #d97706; }
+        .aqi-unhealthy { color: #dc2626; }
+
+        .status-badge {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 20px;
+        }
+
+        .status-good      { color: #16a34a; background: #f0fdf4; border: 1px solid #bbf7d0; }
+        .status-moderate  { color: #d97706; background: #fffbeb; border: 1px solid #fde68a; }
+        .status-unhealthy { color: #dc2626; background: #fff1f2; border: 1px solid #fecdd3; }
+
+        .health-box {
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 13px;
+            line-height: 1.6;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin-top: 16px;
+        }
+
+        .health-box i { font-size: 15px; flex-shrink: 0; margin-top: 2px; }
+        .health-unhealthy { background: #fff1f2; color: #dc2626; border: 1px solid #fecdd3; }
+        .health-moderate  { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+        .health-good      { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+
+        .image-preview { border-radius: 10px; overflow: hidden; border: 1px solid #e2e8f0; }
+        .image-preview img { width: 100%; display: block; max-height: 200px; object-fit: cover; }
+
+        .card-divider { border: none; border-top: 1px solid #f1f5f9; margin: 16px 0; }
+
+        .search-row { display: flex; gap: 8px; margin-bottom: 20px; }
+        .search-row input { flex: 1; padding: 9px 14px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 14px; outline: none; }
+        .search-row input:focus { border-color: #2563eb; }
+
+        .btn-search {
+            padding: 9px 18px;
+            border-radius: 8px;
+            border: none;
+            background: #2563eb;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+            text-decoration: none;
+        }
+
+        .btn-search:hover { background: #1d4ed8; color: #fff; }
+
+        .district-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 14px;
+        }
+
+        .district-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px 16px;
+            text-align: center;
+        }
+
+        .district-card .d-name { font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 8px; }
+        .district-card .d-aqi { font-size: 36px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+
+        .btn-forecast-sm {
+            display: block;
+            margin-top: 12px;
+            padding: 7px;
+            border-radius: 7px;
+            border: none;
+            background: #2563eb;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+
+        .btn-forecast-sm:hover { background: #1d4ed8; color: #fff; }
+
+        .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        .history-table th {
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 12px 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .history-table td {
+            padding: 12px 12px 12px 0;
+            border-bottom: 1px solid #f8fafc;
+            color: #1f2d3d;
+            vertical-align: middle;
+        }
+
+        .history-table tr:last-child td { border-bottom: none; }
+
+        .history-thumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+        }
+
+        .history-aqi { font-weight: 700; font-size: 15px; }
+
+        /* Profile */
+        .profile-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: #fff;
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-name { font-size: 18px; font-weight: 700; color: #1f2d3d; margin-bottom: 4px; }
+        .profile-email { font-size: 13px; color: #94a3b8; margin-bottom: 4px; }
+
+        .stat-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            display: inline-block;
+            min-width: 140px;
+        }
+
+        .stat-num { font-size: 28px; font-weight: 700; color: #2563eb; line-height: 1; margin-bottom: 4px; }
+        .stat-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+
+        /* Edit profile form */
+        .form-label-sm {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 5px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 9px 14px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #1f2d3d;
+            outline: none;
+            margin-bottom: 14px;
+            background: #f8fafc;
+        }
+
+        .form-input:focus { border-color: #2563eb; background: #fff; }
+
+        .btn-save {
+            padding: 9px 24px;
+            border-radius: 8px;
+            border: none;
+            background: #2563eb;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .btn-save:hover { background: #1d4ed8; }
+
+        .btn-edit-profile {
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: 1.5px solid #2563eb;
+            background: transparent;
+            color: #2563eb;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-edit-profile:hover { background: #eff6ff; }
+
+        /* Image modal */
+        .img-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .img-modal-overlay.open { display: flex; }
+
+        .img-modal {
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px;
+            max-width: 480px;
+            width: 90%;
+            position: relative;
+        }
+
+        .img-modal img { width: 100%; border-radius: 10px; margin-bottom: 14px; }
+
+        .img-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .img-modal-close:hover { color: #dc2626; }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar-modern">
+    <a href="/" class="brand">
+        <div style="display:flex;align-items:flex-end;gap:3px;">
+            <span style="display:block;width:5px;height:14px;border-radius:3px;background:#bfdbfe;"></span>
+            <span style="display:block;width:5px;height:20px;border-radius:3px;background:#93c5fd;"></span>
+            <span style="display:block;width:5px;height:28px;border-radius:3px;background:#2563eb;"></span>
+        </div>
+        AirVision
+    </a>
+    <div class="d-flex align-items-center gap-3">
+        <span class="welcome-text">Welcome back, <strong>{{ request.user.username }}</strong></span>
+        <a href="/logout/" class="btn btn-primary">Logout</a>
+    </div>
+</nav>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-label">Menu</div>
+        <button class="sidebar-link active" onclick="showSection('predict', this)">
+            <i class="bi bi-cpu"></i> AQI Prediction
+        </button>
+        <button class="sidebar-link" onclick="showSection('search', this)">
+            <i class="bi bi-search"></i> Search District
+        </button>
+        <button class="sidebar-link" onclick="showSection('history', this)">
+            <i class="bi bi-clock-history"></i> My Predictions
+        </button>
+
+        <div class="sidebar-label">Account</div>
+        <button class="sidebar-link" onclick="showSection('profile', this)">
+            <i class="bi bi-person"></i> View Profile
+        </button>
+    </aside>
+
+    <!-- Main -->
+    <div class="main-content">
+
+        <!-- AQI Prediction -->
+        <div class="section active" id="section-predict">
+            <div class="section-header">
+                <h2>AQI Prediction</h2>
+                <p>Upload an image to predict the Air Quality Index</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card-box">
+                        <div class="card-heading">Upload Image</div>
+                        
+
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="upload-wrapper">
+                                <label class="upload-area">
+                                    <i class="bi bi-cloud-arrow-up"></i>
+                                    <p><strong>Click to upload</strong></p>
+                                    <small id="file-name" style="display:block;margin-top:8px;color:#94a3b8;">No file selected</small>
+                                    <input type="file" name="image" accept="image/*"
+                                           onchange="document.getElementById('file-name').textContent = this.files[0]?.name || 'No file selected'">
+                                </label>
+                            </div>
+                            <div class="text-center mt-3">
+                                <button type="submit" class="btn btn-primary px-4">Predict AQI</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                {% if image_url %}
+                <div class="col-md-6">
+                    <div class="card-box text-center">
+                        <div class="card-heading mb-3">Prediction Result</div>
+                        <div class="image-preview mb-3">
+                            <img src="{{ image_url }}" alt="Uploaded image">
+                        </div>
+                        <div style="font-size:11px;color:#94a3b8;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:4px;">AQI Score</div>
+                        <div class="result-aqi aqi-unhealthy">{{ aqi_result }}</div>
+                        <div class="status-badge status-unhealthy">{{ aqi_status }}</div>
+                        <hr class="card-divider">
+                        <div class="health-box health-unhealthy">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <div><strong>Health Advice:</strong> {{ health_advice }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+
+        <!-- Search District -->
+        <div class="section" id="section-search">
+            <div class="section-header">
+                <h2>Search District</h2>
+                <p>Check current AQI for major districts</p>
+            </div>
+
+            <div class="card-box">
+                <form method="GET" action="/search/" class="search-row" style="margin-bottom:0;">
+                    <input name="city" list="districts" type="text" placeholder="Enter district name...">
+                    <datalist id="districts">
+                        {% for card in city_cards %}
+                            <option value="{{ card.city }}">
+                        {% endfor %}
+                    </datalist>
+                    <button type="submit" class="btn-search"><i class="bi bi-search me-1"></i>Search</button>
+                </form>
+            </div>
+
+            <div class="card-box">
+                <div class="card-heading mb-3">Major Districts</div>
+                <div class="district-grid">
+                    {% for card in city_cards %}
+                    <div class="district-card">
+                        <div class="d-name">{{ card.city }}</div>
+                        <div class="d-aqi aqi-{{ card.status_class }}">{{ card.aqi }}</div>
+                        <div class="status-badge status-{{ card.status_class }}">{{ card.status }}</div>
+                        <a href="/forecast/{{ card.city|lower }}/" class="btn-forecast-sm">7 Day Forecast</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+<!-- Prediction History -->
+<div class="section" id="section-history">
+    <div class="section-header">
+        <h2> Prediction History</h2>
+    </div>
+
+    <div class="card-box">
+
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>AQI</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>View</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for prediction in predictions %}
+                <tr>
+
+                    <!-- IMAGE -->
+                    <td>
+                        <img src="{{ prediction.image_url }}" class="history-thumb" alt="Uploaded image" onclick="openModal('{{ prediction.image_url }}', '{{ prediction.aqi }}', '{{ prediction.status }}', '{{ prediction.status_class }}', '{{ prediction.health_advice }}')">
+                    </td>
+
+                    <!-- AQI -->
+                    <td>
+                        <span class="history-aqi aqi-{{ prediction.status_class }}">
+                            {{ prediction.aqi }}
+                        </span>
+                    </td>
+
+                    <!-- STATUS -->
+                    <td>
+                        <span class="status-badge status-{{ prediction.status_class }}">
+                            {{ prediction.status }}
+                        </span>
+                    </td>
+
+                    <!-- DATE -->
+                    <td style="color:#94a3b8;">
+                        {{ prediction.created_at|date:"M d, Y h:i A" }}
+                    </td>
+
+                    <!-- VIEW BUTTON -->
+                    <td>
+                        <a href="/prediction_detail/{{ prediction.id }}/"
+                           style="
+                                font-size:12px;
+                                color:#2563eb;
+                                text-decoration:none;
+                                font-weight:600;
+                                padding:6px 10px;
+                                border:1px solid #2563eb;
+                                border-radius:6px;
+                                display:inline-block;
+                           ">
+                            View
+                        </a>
+                    </td>
+
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align:center;color:#94a3b8;">
+                        No predictions found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+    </div>
+</div>
+
+        <!-- View Profile -->
+        <div class="section" id="section-profile">
+            <div class="section-header">
+                <h2>My Profile</h2>
+                <p>Your account information</p>
+            </div>
+
+            <div class="card-box" style="max-width:500px;">
+                <div class="d-flex align-items-center gap-4 mb-4">
+                    <div class="profile-avatar">{{ request.user.username|first|upper }}</div>
+                    <div>
+                        <div class="profile-name">{{ request.user.username }}</div>
+                        <div class="profile-email">{{ request.user.email }}</div>
+                    </div>
+                </div>
+
+                <hr class="card-divider">
+
+                <div class="stat-box mb-4">
+                    <div class="stat-num">{{ predictions|length|default:"0" }}</div>
+                    <div class="stat-label">Total Predictions</div>
+                </div>
+
+                <hr class="card-divider">
+
+                <button class="btn btn-primary" onclick="showSection('edit', null)">
+                    <i class="bi bi-pencil me-1"></i>Edit Profile
+                </button>
+            </div>
+        </div>
+
+
+        <!-- Edit Profile -->
+<div class="section" id="section-edit">
+
+    <div class="section-header">
+        <h2>Edit Profile</h2>
+        <p>Update your account details</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-info">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card-box" style="max-width:500px;">
+
+        <form method="POST" action="{% url 'profile' %}">
+            {% csrf_token %}
+
+            <label class="form-label-sm">Username</label>
+
+            <input type="text"
+                   name="username"
+                   class="form-input"
+                   value="{{ request.user.username }}"
+                   required>
+            <label class="form-label-sm mt-3">
+                New Password
+            </label>
+
+            <input type="password"
+                   name="password1"
+                   id="password1"
+                   class="form-input"
+                   placeholder="Enter new password"
+                   oninput="checkStrength(this.value)">
+            <div id="strength-text" style="font-size:12px;color:#64748b;margin-top:-10px;margin-bottom:10px;"></div>
+
+            <label class="form-label-sm mt-3">
+                Confirm New Password
+            </label>
+
+            <input type="password"
+                   name="password2"
+                   id="password2"
+                   class="form-input"
+                   placeholder="Confirm new password"
+                   oninput="checkMatch()">
+            <div id="match-text" style="font-size:12px;color:#64748b;margin-top:-10px;margin-bottom:10px;"></div>
+
+            <div id="form-error" style="display:none;color:#dc2626;font-size:13px;margin-bottom:10px;"></div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- Image View Modal -->
+<div class="img-modal-overlay" id="imgModal">
+    <div class="img-modal">
+        <button class="img-modal-close" onclick="closeModal()"><i class="bi bi-x-lg"></i></button>
+        <img id="modal-img" src="" alt="">
+        <div style="text-align:center;">
+            <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">AQI Score</div>
+            <div id="modal-aqi" class="result-aqi" style="font-size:48px;"></div>
+            <div id="modal-badge" class="status-badge"></div>
+            <div id="modal-health" class="health-box" style="margin-top:14px;text-align:left;"></div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Sidebar navigation
+    function showSection(name, btn) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+        document.getElementById('section-' + name).classList.add('active');
+        if (btn) btn.classList.add('active');
+    }
+
+    // Real-time dates for sample rows
+    document.querySelectorAll('.auto-date').forEach(function(el) {
+        var offset = parseInt(el.getAttribute('data-offset') || '0');
+        var d = new Date();
+        d.setDate(d.getDate() - offset);
+        el.textContent = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    });
+
+    // Modal
+    function openModal(imgUrl, aqi, status, statusClass, advice) {
+        document.getElementById('modal-img').src = imgUrl;
+        var aqiEl = document.getElementById('modal-aqi');
+        aqiEl.textContent = aqi;
+        aqiEl.className = 'result-aqi aqi-' + statusClass;
+        var badge = document.getElementById('modal-badge');
+        badge.textContent = status;
+        badge.className = 'status-badge status-' + statusClass;
+        var health = document.getElementById('modal-health');
+        var icon = statusClass === 'unhealthy' ? 'exclamation-triangle-fill' : statusClass === 'moderate' ? 'exclamation-circle-fill' : 'check-circle-fill';
+        health.className = 'health-box health-' + statusClass;
+        health.innerHTML = '<i class="bi bi-' + icon + '"></i><div><strong>Health Advice:</strong> ' + advice + '</div>';
+        document.getElementById('imgModal').classList.add('open');
+    }
+
+    function closeModal() {
+        document.getElementById('imgModal').classList.remove('open');
+    }
+
+    document.getElementById('imgModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    // Password strength
+    function checkStrength(val) {
+        var fill = document.getElementById('strength-fill');
+        var text = document.getElementById('strength-text');
+        if (!val) { fill.style.width = '0%'; text.textContent = ''; return; }
+        var score = 0;
+        if (val.length >= 8) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+        var levels = [
+            { w: '25%', bg: '#dc2626', label: 'Weak' },
+            { w: '50%', bg: '#d97706', label: 'Fair' },
+            { w: '75%', bg: '#2563eb', label: 'Good' },
+            { w: '100%', bg: '#16a34a', label: 'Strong' }
+        ];
+        var l = levels[score - 1] || levels[0];
+        fill.style.width = l.w;
+        fill.style.background = l.bg;
+        text.textContent = 'Password strength: ' + l.label;
+        text.style.color = l.bg;
+    }
+
+    function checkMatch() {
+        var p1 = document.getElementById('password1').value;
+        var p2 = document.getElementById('password2').value;
+        var el = document.getElementById('match-text');
+        if (!p2) { el.textContent = ''; return; }
+        if (p1 === p2) { el.textContent = 'Passwords match'; el.style.color = '#16a34a'; }
+        else { el.textContent = 'Passwords do not match'; el.style.color = '#dc2626'; }
+    }
+
+    function validateForm() {
+        var p1 = document.getElementById('password1').value;
+        var p2 = document.getElementById('password2').value;
+        var err = document.getElementById('form-error');
+        if (p1 && p1.length < 8) {
+            err.textContent = 'Password must be at least 8 characters.';
+            err.style.display = 'block'; return false;
+        }
+        if (p1 && p1 !== p2) {
+            err.textContent = 'Passwords do not match.';
+            err.style.display = 'block'; return false;
+        }
+        err.style.display = 'none';
+        return true;
+    }
+</script>
+
+</body>
+</html>
