@@ -1,5 +1,4 @@
-from typing import List, Dict
-
+# --- STATIC DISTRICT BASELINE DATA & CONFIGURATION ---
 CITY_AQI_DATA = {
     "bhaktapur": {
         "aqi": 70,
@@ -51,37 +50,22 @@ CITY_AQI_DATA = {
     },
 }
 
-
-DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-
 ADVICE_MAP = {
     "good": "Air quality is satisfactory. Enjoy outdoor activities.",
     "moderate": "Sensitive groups should limit prolonged outdoor exertion.",
     "unhealthy": "Reduce outdoor activities. Wear a mask when going outside.",
 }
 
-CITY_TO_MODEL_NAME = {
-    "bhaktapur": "Bhaktapur_model.pkl",
-    "hetauda": "Hetauda_model.pkl",
-    "ilam": "Ilam_model.pkl",
-    "janakpur": "Janakpur_model.pkl",
-    "khumaltar": "Khumaltar_model.pkl",
-    "kirtipur": "Kirtipur_model.pkl",
-    "mahendranagar": "Mahendranagar_model.pkl",
-}
-
-MODEL_CITIES = sorted(CITY_TO_MODEL_NAME.keys())
-
+# The list of cities supported by the machine learning models
+MODEL_CITIES = ["bhaktapur", "hetauda", "ilam", "janakpur", "khumaltar", "kirtipur", "mahendranagar"]
 
 def normalize_city(city: str) -> str:
     return city.strip().lower() if city else ""
-
 
 def status_class(status: str) -> str:
     if not status:
         return "moderate"
     return status.lower()
-
 
 def aqi_status(aqi: int) -> str:
     if aqi <= 50:
@@ -90,8 +74,7 @@ def aqi_status(aqi: int) -> str:
         return "Moderate"
     return "Unhealthy"
 
-
-def make_forecast_item(day: str, aqi: int) -> Dict[str, object]:
+def make_forecast_item(day: str, aqi: int) -> dict:
     status = aqi_status(aqi)
     return {
         "day": day,
@@ -100,8 +83,7 @@ def make_forecast_item(day: str, aqi: int) -> Dict[str, object]:
         "status_class": status_class(status),
     }
 
-
-def enrich_forecast(forecast_list: List[Dict[str, object]]) -> List[Dict[str, object]]:
+def enrich_forecast(forecast_list):
     return [
         {
             "day": item["day"],
@@ -112,8 +94,8 @@ def enrich_forecast(forecast_list: List[Dict[str, object]]) -> List[Dict[str, ob
         for item in forecast_list
     ]
 
-
-def build_city_cards() -> List[Dict[str, object]]:
+# Builds district cards dynamically for dashboard/landing pages
+def build_city_cards():
     cards = []
     for city in MODEL_CITIES:
         data = CITY_AQI_DATA.get(city, {
@@ -130,8 +112,7 @@ def build_city_cards() -> List[Dict[str, object]]:
         })
     return cards
 
-
-def get_city_data(city: str) -> Dict[str, object]:
+def get_city_data(city: str):
     city_lower = normalize_city(city)
     return CITY_AQI_DATA.get(city_lower, {
         "aqi": 85,
@@ -139,5 +120,3 @@ def get_city_data(city: str) -> Dict[str, object]:
         "status": "Moderate",
         "advice": "Monitor air quality conditions.",
     })
-
-

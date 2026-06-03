@@ -65,11 +65,34 @@
                     <div class="info-value">{{ pm25 }} µg/m³</div>
                 </div>
                 {% if next_day %}
-                <div class="info-box">
+                <div class="info-box mb-3">
                     <div class="info-label">Predicted next day AQI</div>
                     <div class="info-value">{{ next_day }}</div>
                 </div>
                 {% endif %}
+
+                <!-- Model predictor input form -->
+                <div class="info-box p-3 mt-3 bg-light border-0">
+                    <div class="info-label mb-2" style="font-size:11px;color:#475569;font-weight:700;">Adjust Model Inputs (PM2.5)</div>
+                    <form method="GET" action="" class="row g-2">
+                        <div class="col-4">
+                            <label for="x1" class="text-muted mb-1 d-block" style="font-size: 9px; font-weight: 700; text-transform: uppercase;">3 Days Ago</label>
+                            <input type="number" step="any" class="form-control form-control-sm rounded-3 border" id="x1" name="x1" value="{{ x1|floatformat:1 }}" required>
+                        </div>
+                        <div class="col-4">
+                            <label for="x2" class="text-muted mb-1 d-block" style="font-size: 9px; font-weight: 700; text-transform: uppercase;">2 Days Ago</label>
+                            <input type="number" step="any" class="form-control form-control-sm rounded-3 border" id="x2" name="x2" value="{{ x2|floatformat:1 }}" required>
+                        </div>
+                        <div class="col-4">
+                            <label for="x3" class="text-muted mb-1 d-block" style="font-size: 9px; font-weight: 700; text-transform: uppercase;">Yesterday</label>
+                            <input type="number" step="any" class="form-control form-control-sm rounded-3 border" id="x3" name="x3" value="{{ x3|floatformat:1 }}" required>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <button type="submit" class="btn btn-primary btn-sm w-100 rounded-3" style="font-size:12px;">Recalculate Forecast</button>
+                        </div>
+                    </form>
+                </div>
+
                 <div class="mt-3 text-muted" style="font-size:13px;">
                     Forecast source: {{ forecast_source|default:'model'|title }}
                 </div>
