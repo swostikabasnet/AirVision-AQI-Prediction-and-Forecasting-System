@@ -709,7 +709,7 @@
 
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-info">
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
                 {{ message }}
             </div>
         {% endfor %}
@@ -717,9 +717,8 @@
 
     <div class="card-box" style="max-width:500px;">
 
-        <form method="POST" action="{% url 'profile' %}">
+        <form method="POST" action="{% url 'edit_profile' %}" onsubmit="return validateForm()">
             {% csrf_token %}
-
             <label class="form-label-sm">Username</label>
 
             <input type="text"
@@ -736,9 +735,7 @@
                    id="password1"
                    class="form-input"
                    placeholder="Enter new password"
-                   oninput="checkStrength(this.value)">
-            <div id="strength-text" style="font-size:12px;color:#64748b;margin-top:-10px;margin-bottom:10px;"></div>
-
+                   >
             <label class="form-label-sm mt-3">
                 Confirm New Password
             </label>
@@ -748,10 +745,7 @@
                    id="password2"
                    class="form-input"
                    placeholder="Confirm new password"
-                   oninput="checkMatch()">
-            <div id="match-text" style="font-size:12px;color:#64748b;margin-top:-10px;margin-bottom:10px;"></div>
-
-            <div id="form-error" style="display:none;color:#dc2626;font-size:13px;margin-bottom:10px;"></div>
+                   >
             <button type="submit" class="btn btn-primary">Save Changes</button>
 
         </form>
@@ -816,52 +810,23 @@
         if (e.target === this) closeModal();
     });
 
-    // Password strength
-    function checkStrength(val) {
-        var fill = document.getElementById('strength-fill');
-        var text = document.getElementById('strength-text');
-        if (!val) { fill.style.width = '0%'; text.textContent = ''; return; }
-        var score = 0;
-        if (val.length >= 8) score++;
-        if (/[A-Z]/.test(val)) score++;
-        if (/[0-9]/.test(val)) score++;
-        if (/[^A-Za-z0-9]/.test(val)) score++;
-        var levels = [
-            { w: '25%', bg: '#dc2626', label: 'Weak' },
-            { w: '50%', bg: '#d97706', label: 'Fair' },
-            { w: '75%', bg: '#2563eb', label: 'Good' },
-            { w: '100%', bg: '#16a34a', label: 'Strong' }
-        ];
-        var l = levels[score - 1] || levels[0];
-        fill.style.width = l.w;
-        fill.style.background = l.bg;
-        text.textContent = 'Password strength: ' + l.label;
-        text.style.color = l.bg;
-    }
-
-    function checkMatch() {
-        var p1 = document.getElementById('password1').value;
-        var p2 = document.getElementById('password2').value;
-        var el = document.getElementById('match-text');
-        if (!p2) { el.textContent = ''; return; }
-        if (p1 === p2) { el.textContent = 'Passwords match'; el.style.color = '#16a34a'; }
-        else { el.textContent = 'Passwords do not match'; el.style.color = '#dc2626'; }
-    }
-
+// Password validation
     function validateForm() {
-        var p1 = document.getElementById('password1').value;
-        var p2 = document.getElementById('password2').value;
-        var err = document.getElementById('form-error');
-        if (p1 && p1.length < 8) {
-            err.textContent = 'Password must be at least 8 characters.';
-            err.style.display = 'block'; return false;
+        var password1 = document.getElementById('password1').value;
+        var password2 = document.getElementById('password2').value;
+
+        if (password1 || password2) {
+            if (password1.length < 8) {
+                alert("Password must be at least 8 characters long.");
+                return false;
+            }
+            if (password1 !== password2) {
+                alert("Passwords do not match.");
+                return false;
+            }
         }
-        if (p1 && p1 !== p2) {
-            err.textContent = 'Passwords do not match.';
-            err.style.display = 'block'; return false;
-        }
-        err.style.display = 'none';
         return true;
+        
     }
 </script>
 

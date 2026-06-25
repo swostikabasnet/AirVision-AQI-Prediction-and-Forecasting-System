@@ -1,12 +1,16 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from accounts.forms import RegisterForm
 from accounts.models import CustomUser, Prediction
+
 User = get_user_model()
+
 
 
 
@@ -48,37 +52,32 @@ def logout_view(request):
 
 
 # ─────────────────────────────────────────────
-#  Profile
+# Edit  Profile (user dashboard)
 # ─────────────────────────────────────────────
 
 @login_required
-def profile_view(request):
+def edit_profile(request):
     if request.method == 'POST':
         username = request.POST.get('username')
-        email = request.POST.get('email')
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
+
         user = request.user
 
         if username:
             user.username = username
-        if email is not None:
-            user.email = email
 
         if password1 or password2:
             if password1 != password2:
                 messages.error(request, "Passwords do not match")
-                return redirect('profile')
-            if len(password1) < 6:
-                messages.error(request, "Password must be at least 6 characters")
-                return redirect('profile')
-            user.password = make_password(password1)
+                return redirect('user_dashboard')
+            if len(password1) < 8:
+                messages.error(request, "Password must be at least 8 characters")
+                return redirect('user_dashboard')
+            user.set_password(password1)
 
         user.save()
+        update_session_auth_hash(request, user) # Update session to prevent logout after password change
         messages.success(request, "Profile updated successfully")
-        return redirect('profile')
-
-    last_prediction = Prediction.objects.filter(user=request.user).order_by('-created_at').first()
-    return render(request, 'profile.html', {
-        'last_prediction': last_prediction,
-    })
+        return redirect('user_dashboard')
+    
