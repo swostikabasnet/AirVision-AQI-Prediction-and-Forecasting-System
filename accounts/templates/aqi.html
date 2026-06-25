@@ -3,24 +3,186 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AirVision - {{ city }} AQI</title>
     <meta name="description" content="Current AQI and forecast for {{ city }}.">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/custom.css' %}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-..." crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        .aqi-summary-card { border: 1px solid #e2e8f0; }
-        .aqi-score-circle { width: 90px; height: 90px; border-radius: 50%; background: #eff6ff; color: #1d4ed8; font-size: 28px; font-weight: 700; }
-        .info-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 14px; }
-        .info-label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
-        .info-value { font-size: 16px; font-weight: 700; color: #1f2937; }
-        .recommendation-box { background: #f8fafc; }
-        .forecast-panel { border: 1px solid #e2e8f0; }
-        .forecast-card { background: #f8fafc; }
+        :root {
+            --av-bg-1: #eef2ff;
+            --av-bg-2: #f8fafc;
+            --av-border: #e2e8f0;
+            --av-primary: #2563eb;
+            --av-ink: #1f2937;
+            --av-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(900px 500px at 12% -10%, #dbeafe 0%, transparent 55%),
+                radial-gradient(900px 500px at 100% 0%, #e0e7ff 0%, transparent 50%),
+                #f1f5f9;
+            min-height: 100vh;
+        }
+
+        /* ---------- Navbar ---------- */
+        .search-box { position: relative; width: 240px; }
+        .search-box input {
+            width: 100%;
+            padding: 8px 36px 8px 14px;
+            border-radius: 22px;
+            border: 1px solid #e2e8f0;
+            outline: none;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search-box input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+        .search-icon {
+            position: absolute; right: 11px; top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8; background: none;
+            border: none; padding: 0; cursor: pointer; font-size: 14px;
+        }
+
+        /* ---------- main card ---------- */
+        .aqi-main-card {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 28px;
+            box-shadow: 0 24px 60px -20px rgba(30, 64, 175, 0.30);
+        }
+
+        /* ---------- Big circular indicator (main focus) ---------- */
+        .aqi-circle-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .aqi-circle {
+            position: relative;
+            width: 230px;
+            height: 230px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            box-shadow:
+                0 0 0 14px rgba(37, 99, 235, 0.08),
+                0 18px 40px -12px rgba(37, 99, 235, 0.45);
+        }
+
+        .aqi-circle-label {
+            font-size: 12px;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: var(--av-muted);
+            font-weight: 600;
+        }
+        .aqi-circle-value {
+            font-size: 64px;
+            line-height: 1;
+            font-weight: 800;
+            color: var(--av-primary);
+            margin: 4px 0 2px;
+        }
+        .aqi-circle-unit {
+            font-size: 12px;
+            color: var(--av-muted);
+            font-weight: 600;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 15px;
+        }
+        .status-pill .dot {
+            width: 9px; height: 9px; border-radius: 50%;
+            background: currentColor;
+        }
+        .status-badge 
+      { display: inline-block; 
+        font-size: 13px; 
+        font-weight: 600; 
+        padding: 4px 14px; 
+        border-radius: 20px; 
+        margin-bottom: 18px; 
+      }
+      .status-good 
+      { color: #16a34a; 
+        background: #f0fdf4; 
+        border: 1px solid #bbf7d0; 
+      }
+      .status-moderate 
+      { color: #d97706; 
+        background: #fffbeb; 
+        border: 1px solid #fde68a; 
+      }
+      .status-unhealthy 
+      { color: #dc2626; 
+        background: #fff1f2; 
+        border: 1px solid #fecdd3; 
+      }
+      .aqi-good 
+      { color: #16a34a;
+      }
+      .aqi-moderate 
+      { color: #d97706; 
+      }
+      .aqi-unhealthy 
+      { color: #dc2626; 
+      }
+        /* ---------- Info boxes ---------- */
+        .info-box {
+            background: rgba(248, 250, 252, 0.85);
+            border: 1px solid var(--av-border);
+            border-radius: 18px;
+            padding: 16px 18px;
+            height: 100%;
+        }
+        .info-label {
+            font-size: 11px;
+            color: var(--av-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .info-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--av-ink);
+        }
+        .recommendation-box {
+            background: rgba(239, 246, 255, 0.8);
+            border: 1px solid #dbeafe;
+            border-radius: 18px;
+            padding: 18px 20px;
+        }
+
+        
     </style>
 </head>
-<body class="bg-light">
-<nav class="navbar navbar-expand-lg" style="background:#ffffff; border-bottom:1px solid #e2e8f0;">
+<body>
+<nav class="navbar navbar-expand-lg" style="background:rgba(255,255,255,0.8); backdrop-filter:blur(12px); border-bottom:1px solid var(--av-border);">
   <div class="container-fluid d-flex align-items-center justify-content-between">
     <a class="navbar-brand d-flex align-items-center" href="/" style="color:#1f2d3d; font-weight:700;">
       <div style="display:flex; align-items:flex-end; gap:3px; margin-right:10px;">
@@ -30,140 +192,85 @@
       </div>
       AirVision
     </a>
-    {% if user.is_authenticated %}
-    <a href="/user/" class="btn btn-primary">Back to Dashboard</a>
-    {% else %}
-    <div class="d-flex gap-2">
-      <a href="/" class="btn btn-primary">Home</a>
-      <a href="/login/" class="btn btn-primary">Login</a>
+    <div class="d-flex align-items-center gap-3">
+        <form method="GET" action="/search/" class="search-box d-none d-md-flex" style="margin:0;">
+            <input name="city" list="districts" type="text" placeholder="Search district...">
+            <datalist id="districts">
+                {% for card in city_cards %}
+                <option value="{{ card.city }}"></option>
+                {% endfor %}
+            </datalist>
+            <button type="submit" class="search-icon"><i class="bi bi-search"></i></button>
+        </form>
+        
     </div>
-    {% endif %}
+    
   </div>
 </nav>
+
 <div class="container py-5">
-    <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mb-4">
-        <div>
-            <h1 class="mb-2" style="font-family: 'Inter', sans-serif;">{{ city }} Air Quality</h1>
-            <p class="text-muted mb-0">PM2.5 focused AQI forecast and health advice for {{ city }}.</p>
-        </div>
+
+    <!-- Page header -->
+    <div class="text-center mb-5">
+        <h1 class="mb-2 fw-bold">{{ city }} Air Quality</h1>
     </div>
 
-    <div class="row g-4 align-items-stretch">
-        <div class="col-lg-5">
-            <div class="aqi-summary-card p-4 rounded-4 shadow-sm bg-white">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <div>
-                        <div class="text-uppercase text-muted" style="font-size:12px; letter-spacing:1px;">Current AQI</div>
-                        <h2 class="display-5 mb-1">{{ aqi }}</h2>
-                        <span class="status-badge status-{{ status_class }}">{{ status }}</span>
-                    </div>
-                    <div class="aqi-score-circle d-flex align-items-center justify-content-center">{{ aqi }}</div>
-                </div>
-                <p class="text-muted mb-4">{{ advice }}</p>
-                <div class="row g-3">
-                    <div class="col-6">
-                        <div class="info-box">
-                            <div class="info-label">PM2.5 focus</div>
-                            <div class="info-value">Yes</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="info-box">
-                            <div class="info-label">AQI range</div>
-                            <div class="info-value">{{ aqi }} / 500</div>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="info-box">
-                            <div class="info-label">PM2.5 concentration</div>
-                            <div class="info-value">{{ pm25 }} µg/m³</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <div class="info-label mb-2">Recommended action</div>
-                    <div class="recommendation-box rounded-3 p-3 bg-light">
-                        <strong>{{ status }}</strong> - {{ advice }}
-                    </div>
-                </div>
-                {% if next_day %}
-                <div class="mt-3">
-                    <div class="info-box p-3 mb-3">
-                        <div class="info-label">Predicted next day AQI</div>
-                        <div class="info-value">{{ next_day }}</div>
-                    </div>
-                </div>
-                {% endif %}
+    <!-- Main card -->
+    <div class="row justify-content-center">
+        <div class="col-lg-9 col-xl-8">
+            <div class="aqi-main-card p-4 p-md-5">
+                <div class="row g-4 align-items-center">
 
-                <!-- Model predictor input form -->
-                <div class="info-box p-3 mt-3 bg-light border-0">
-                    <div class="info-label mb-2" style="font-size:11px;color:#475569;font-weight:700;">Adjust Model Inputs (PM2.5)</div>
-                    <form method="GET" action="" class="row g-2">
-                        <div class="col-4">
-                            <label for="x1" class="text-muted mb-1 d-block" style="font-size: 9px; font-weight: 700; text-transform: uppercase;">3 Days Ago</label>
-                            <input type="number" step="any" class="form-control form-control-sm rounded-3 border" id="x1" name="x1" value="{{ x1|floatformat:1 }}" required>
+                    <!-- Circular indicator: for AQI -->
+                    <div class="col-md-5">
+                        <div class="aqi-circle-wrap mb-3 mb-md-0">
+                            <div class="aqi-circle aqi-{{ status_class }}">
+                                <span class="aqi-circle-label">Current AQI</span>
+                                <span class="aqi-circle-value">{{ aqi }}</span>
+                            
+                            </div>
                         </div>
-                        <div class="col-4">
-                            <label for="x2" class="text-muted mb-1 d-block" style="font-size: 9px; font-weight: 700; text-transform: uppercase;">2 Days Ago</label>
-                            <input type="number" step="any" class="form-control form-control-sm rounded-3 border" id="x2" name="x2" value="{{ x2|floatformat:1 }}" required>
-                        </div>
-                        <div class="col-4">
-                            <label for="x3" class="text-muted mb-1 d-block" style="font-size: 9px; font-weight: 700; text-transform: uppercase;">Yesterday</label>
-                            <input type="number" step="any" class="form-control form-control-sm rounded-3 border" id="x3" name="x3" value="{{ x3|floatformat:1 }}" required>
-                        </div>
-                        <div class="col-12 mt-2">
-                            <button type="submit" class="btn btn-primary btn-sm w-100 rounded-3" style="font-size:12px;">Recalculate Forecast</button>
-                        </div>
-                    </form>
-                </div>
+                       
+                        
+                    </div>
 
-                <div class="mt-3 text-muted" style="font-size:13px;">
-                    Forecast source: {{ forecast_source|default:'model'|title }}
-                </div>
-                <div class="mt-2 text-success" style="font-size:13px;">
-                    The 7-day forecast for this city is generated from the trained model.
-                </div>
-                <div class="mt-3">
-                    <a href="/forecast/{{ city|lower }}/" class="btn btn-primary btn-sm">View 7 Day Forecast</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-7">
-            <div class="forecast-panel p-4 rounded-4 shadow-sm bg-white">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <div>
-                        <div class="text-uppercase text-muted" style="font-size:12px; letter-spacing:1px;">AQI details</div>
-                        <h3 class="mb-0">AQI score, status, and PM2.5</h3>
-                    </div>
-                </div>
-                <div class="info-box p-3 mb-4">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <div class="info-label">AQI score</div>
-                            <div class="fs-4 fw-bold">{{ aqi }}</div>
+                    <!-- Key metrics + advice -->
+                    <div class="col-md-7">
+                        <div class="row g-3">
+                            <div class="col-5">
+                                <div class="info-box">
+                                    <div class="info-label">AQI Score</div>
+                                    <div class="info-value">{{ aqi }}</div>
+                                </div>
+                            </div>
+                            <div class="col-7">
+                                <div class="info-box">
+                                    <div class="info-label">PM2.5 Concentration</div>
+                                    <div class="info-value">{{ pm25 }} µg/m³</small></div>
+                                </div>
+                            </div>
+                            
                         </div>
-                        <span class="status-badge status-{{ status_class }}">{{ status }}</span>
-                    </div>
-                    <div class="mt-3">
-                        <div class="info-label">PM2.5 concentration</div>
-                        <div class="info-value">{{ pm25 }} µg/m³</div>
-                    </div>
-                </div>
-                <div class="row g-3">
-                    {% for day in forecast %}
-                    <div class="col-6 col-xl-4">
-                        <div class="forecast-card border rounded-4 p-3 text-center h-100">
-                            <div class="text-uppercase text-muted mb-2" style="font-size:12px;">{{ day.day }}</div>
-                            <div class="fs-4 fw-bold mb-1">{{ day.aqi }}</div>
-                            <div class="status-badge status-{{ day.status_class }}">{{ day.status }}</div>
+
+                        <div class="recommendation-box mt-3">
+                            <div class="info-label mb-2">
+                                 <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i>Health Recommendation</div>
+                            <p class="mb-0 text-secondary" style="line-height:1.55; font-size:12px;">{{ advice }}</p>
+                        </div>
+
+                        <div class="mt-4 d-grid d-sm-block">
+                            <a href="/forecast/{{ city|lower }}/" class="btn btn-primary  rounded-3">
+                                View 7 Day Forecast
+                            </a>
                         </div>
                     </div>
-                    {% endfor %}
+
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-..." crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 </body>
 </html>

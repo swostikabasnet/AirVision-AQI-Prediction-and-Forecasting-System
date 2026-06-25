@@ -9,6 +9,7 @@ from accounts.models import CustomUser, Prediction
 User = get_user_model()
 
 
+
 # ─────────────────────────────────────────────
 #  Auth views
 # ─────────────────────────────────────────────
@@ -33,7 +34,7 @@ def login_view(request):
         user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
-            if user.is_admin:
+            if user.is_admin or user.is_superuser:
                 return redirect('admin_dashboard')
             else:
                 return redirect('user_dashboard')

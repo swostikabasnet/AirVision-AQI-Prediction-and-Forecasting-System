@@ -235,6 +235,39 @@
 
         .btn-search:hover { background: #1d4ed8; color: #fff; }
 
+        .btn-action {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: background 0.15s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-blue {
+            background:  #eff6ff;
+            color: #2563eb;
+        }
+
+        .btn-blue:hover {
+            background:  #dbeafe;
+            color: #2563eb;
+        }
+
+        .btn-red {
+            background: #fff1f2;
+            color: #dc2626;
+           
+        }
+
+        .btn-red:hover {
+            background:#fee2e2;
+            color: #dc2626;
+        }
+
         .district-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -503,11 +536,17 @@
                             <img src="{{ image_url }}" alt="Uploaded image">
                         </div>
                         <div style="font-size:11px;color:#94a3b8;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:4px;">AQI Score</div>
-                        <div class="result-aqi aqi-unhealthy">{{ aqi_result }}</div>
-                        <div class="status-badge status-unhealthy">{{ aqi_status }}</div>
+                        <div class="result-aqi aqi-{{ aqi_status_class }}">{{ aqi_result }}</div>
+                        <div class="status-badge status-{{ aqi_status_class }}">{{ aqi_status }}</div>
                         <hr class="card-divider">
-                        <div class="health-box health-unhealthy">
+                        <div class="health-box health-{{ aqi_status_class }}">
+                            {% if aqi_status_class == 'good' %}
+                            <i class="bi bi-check-circle-fill"></i>
+                            {% elif aqi_status_class == 'moderate' %}
+                            <i class="bi bi-exclamation-circle-fill"></i>
+                            {% else %}
                             <i class="bi bi-exclamation-triangle-fill"></i>
+                            {% endif %}
                             <div><strong>Health Advice:</strong> {{ health_advice }}</div>
                         </div>
                     </div>
@@ -515,6 +554,7 @@
                 {% endif %}
             </div>
         </div>
+
 
 
         <!-- Search District -->
@@ -566,7 +606,7 @@
                     <th>AQI</th>
                     <th>Status</th>
                     <th>Date</th>
-                    <th>View</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
 
@@ -598,20 +638,16 @@
                         {{ prediction.created_at|date:"M d, Y h:i A" }}
                     </td>
 
-                    <!-- VIEW BUTTON -->
+                    <!-- ACTION BUTTONS -->
                     <td>
-                        <a href="/prediction_detail/{{ prediction.id }}/"
-                           style="
-                                font-size:12px;
-                                color:#2563eb;
-                                text-decoration:none;
-                                font-weight:600;
-                                padding:6px 10px;
-                                border:1px solid #2563eb;
-                                border-radius:6px;
-                                display:inline-block;
-                           ">
-                            View
+                        <a href="{% url 'prediction_detail' prediction.id %}"
+                           class="btn-action btn-blue">
+                            <i class="bi bi-eye me-1"></i>View
+                        </a>
+                        <a href="{% url 'prediction_delete' prediction.id %}"
+                           class="btn-action btn-red"
+                           onclick="return confirm('Delete this prediction?');">
+                            <i class="bi bi-trash me-1"></i>Delete
                         </a>
                     </td>
 

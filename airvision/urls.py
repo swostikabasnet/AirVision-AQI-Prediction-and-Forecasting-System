@@ -25,7 +25,11 @@ urlpatterns = [
     # AUTH + ACCOUNT APP
     path('', include('accounts.urls')),
     path('accounts/', include('accounts.urls')),
-
+path(
+    "predict-aqi/",
+    views.predict_aqi_ajax,
+    name="predict_aqi_ajax"
+),
     # Urls for main app views
     path('', views.landing_page, name='landing_page'), # Landing page
     path('user/', views.user_dashboard, name='user_dashboard'),
@@ -35,6 +39,7 @@ urlpatterns = [
     path('aqi/<str:city>/', views.aqi_view, name='aqi'),
     path('users/delete/<int:id>/', views.delete_user, name='delete_user'),#delete users by admin
     path('myadmin/prediction/delete/<int:id>/', views.delete_prediction, name='delete_prediction'),
+    path('prediction_delete/<int:id>/', views.delete_prediction, name='prediction_delete'),
     path('prediction/view/<int:id>/', views.prediction_detail, name='prediction_detail'), # Detailed report view for individual predictions
     path('prediction_detail/<int:id>/', views.prediction_detail, name='prediction_detail_alias'),
     path('manual_aqi_delete/<int:id>/', views.delete_aqi_record, name='delete_aqi_record'),

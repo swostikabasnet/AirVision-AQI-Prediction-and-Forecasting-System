@@ -6,47 +6,35 @@ CITY_AQI_DATA = {
         "status": "Moderate",
         "advice": "Moderate air quality. Sensitive groups should be cautious during prolonged outdoor activity."
     },
+    "kathmandu": {
+        "aqi": 125,
+        "pm25": 45,
+        "status": "Unhealthy",
+        "advice": "Reduce outdoor activities. Wear a mask when going outside."
+    },
+    "nepalgunj": {
+        "aqi": 95,
+        "pm25": 35,
+        "status": "Moderate",
+        "advice": "Sensitive groups should limit prolonged outdoor exertion."
+    },
     "biratnagar": {
         "aqi": 58,
         "pm25": 24,
         "status": "Moderate",
         "advice": "Moderate air quality. Sensitive groups should be cautious."
     },
-    "hetauda": {
-        "aqi": 75,
-        "pm25": 32,
+    "dhangadhi": {
+        "aqi": 88,
+        "pm25": 30,
         "status": "Moderate",
-        "advice": "Moderate air quality. Sensitive groups should limit prolonged outdoor exertion."
+        "advice": "Moderate air quality. Stay aware of outdoor activity levels."
     },
-    "ilam": {
-        "aqi": 50,
-        "pm25": 18,
+    "surkhet": {
+        "aqi": 48,
+        "pm25": 15,
         "status": "Good",
         "advice": "Air quality is good. Enjoy outdoor activities freely."
-    },
-    "janakpur": {
-        "aqi": 88,
-        "pm25": 45,
-        "status": "Moderate",
-        "advice": "Moderate air quality. Sensitive groups should be cautious during prolonged activity."
-    },
-    "khumaltar": {
-        "aqi": 95,
-        "pm25": 48,
-        "status": "Moderate",
-        "advice": "Air quality is moderate. Limit long periods outside if you are sensitive."
-    },
-    "kirtipur": {
-        "aqi": 62,
-        "pm25": 22,
-        "status": "Moderate",
-        "advice": "Air quality is moderate. Stay aware of outdoor activity levels."
-    },
-    "mahendranagar": {
-        "aqi": 55,
-        "pm25": 20,
-        "status": "Good",
-        "advice": "Air quality is good. Outdoor activities are safe for most people."
     },
 }
 
@@ -57,7 +45,7 @@ ADVICE_MAP = {
 }
 
 # The list of cities supported by the machine learning models
-MODEL_CITIES = ["bhaktapur", "hetauda", "ilam", "janakpur", "khumaltar", "kirtipur", "mahendranagar"]
+MODEL_CITIES = ["bhaktapur", "kathmandu", "nepalgunj", "biratnagar", "dhangadhi", "surkhet"]
 
 def normalize_city(city: str) -> str:
     return city.strip().lower() if city else ""
@@ -65,8 +53,16 @@ def normalize_city(city: str) -> str:
 def status_class(status: str) -> str:
     if not status:
         return "moderate"
-    return status.lower()
+    status_lower = status.lower()
+    if "unhealthy" in status_lower:
+        return "unhealthy"
+    if "moderate" in status_lower:
+        return "moderate"
+    if "good" in status_lower:
+        return "good"
+    return status_lower
 
+# AQI status based on the AQI value
 def aqi_status(aqi: int) -> str:
     if aqi <= 50:
         return "Good"
