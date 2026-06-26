@@ -1,3 +1,4 @@
+{% load tz %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -497,6 +498,14 @@
     <!-- Main -->
     <div class="main-content">
 
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}" style="margin-bottom:16px;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
         <!-- AQI Prediction -->
         <div class="section active" id="section-predict">
             <div class="section-header">
@@ -635,7 +644,7 @@
 
                     <!-- DATE -->
                     <td style="color:#94a3b8;">
-                        {{ prediction.created_at|date:"M d, Y h:i A" }}
+                        {{ prediction.created_at|localtime|date:"M d, Y h:i A" }}
                     </td>
 
                     <!-- ACTION BUTTONS -->
@@ -706,14 +715,6 @@
         <h2>Edit Profile</h2>
         <p>Update your account details</p>
     </div>
-
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
 
     <div class="card-box" style="max-width:500px;">
 

@@ -1,3 +1,4 @@
+{% load tz %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -25,7 +26,7 @@
             <div class="aqi">{{ prediction.predicted_aqi }}</div>
             <div class="status {{ status_class }}">{{ prediction.status }}</div>
         </div>
-        <div style="text-align:right; color:#64748b; font-size:13px;">{{ prediction.created_at|date:"M d, Y h:i A" }}</div>
+        <div style="text-align:right; color:#64748b; font-size:13px;">{{ prediction.created_at|localtime|date:"M d, Y h:i A" }}</div>
     </div>
     <div style="font-size:14px; color:#64748b; margin-bottom:14px;">
         <strong>Health Advice:</strong> {{ advice }}

@@ -6,6 +6,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
@@ -442,9 +445,6 @@
         <button class="sidebar-link" onclick="showSection('aqi-data', this)">
             <i class="bi bi-database"></i> AQI Data
         </button>
-        <button class="sidebar-link" onclick="showSection('models', this)">
-            <i class="bi bi-robot"></i> Model Predictions
-        </button>
         <button class="sidebar-link" onclick="showSection('users', this)">
             <i class="bi bi-people"></i> Users
         </button>
@@ -532,13 +532,18 @@
                 <form method="POST">
                     {% csrf_token %}
                     <label class="form-label-sm">City</label>
-                    <input class="form-input" type="text" name="city" placeholder="Kathmandu" required>
+                    <input class="form-input" type="text" name="city"  required>
                     <label class="form-label-sm">Location</label>
-                    <input class="form-input" type="text" name="location" placeholder="Thamel, Patan, etc.">
-                    <label class="form-label-sm">AQI</label>
-                    <input class="form-input" type="number" name="aqi" min="0" placeholder="e.g. 110" required>
+                    <input class="form-input" type="text" name="location" required>
+                    <label class="form-label-sm">AQI <span class="text-muted" style="font-size:11px;">(Good=0-50, Moderate=51-100, Unhealthy=101+)</span></label>
+                    <input class="form-input" type="number" name="aqi" min="0" required>
                     <label class="form-label-sm">Status</label>
-                    <input class="form-input" type="text" name="status" placeholder="Moderate, Unhealthy" required>
+                    <select class="form-input" name="status" required>
+                        <option value="">-- Select --</option>
+                        <option value="Good">Good</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="Unhealthy">Unhealthy</option>
+                    </select>
                     <label class="form-label-sm">Note</label>
                     <textarea class="form-input" name="note" rows="3"></textarea>
                     <button class="btn-primary-solid" type="submit">Save record</button>
@@ -580,18 +585,6 @@
         </div>
     </div>
 </div>
-<div class="section" id="section-models">
-    <div class="section-header">
-        <h2>Model Predictions</h2>
-        <p>Model-generated AQI predictions </p>
-    </div>
-    <!-- <div class="card-box" style="text-align:center;color:#64748b;"> -->
-        
-        <!-- <div>No model outputs available yet.</div>
-        <div style="margin-top:10px;">This section is reserved for trained model results and forecast details.</div> -->
-    <!-- </div> -->
-</div>
-
         <!-- ── USERS ── -->
 <div class="section" id="section-users">
     <div class="section-header">
@@ -660,7 +653,7 @@
 <div class="section" id="section-logs">
     <div class="section-header">
         <h2>Prediction Logs</h2>
-        <p>User uploads and AI-generated AQI results</p>
+        <p>User uploads and AQI results</p>
     </div>
 
     <div class="card-box">

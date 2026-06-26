@@ -26,16 +26,15 @@ CLASS_MAP = {
         "predicted_aqi": 165,
         "health_advice": "Reduce outdoor activities. Wear a mask when going outside."
     },
-    3: {
-        "status": "Unhealthy for Sensitive Groups",
-        "predicted_aqi": 120,
-        "health_advice": "Sensitive groups should limit outdoor exertion. Wear a mask if active outdoors."
-    }
 }
+
+# Map class 3 (if model predicts it) to Unhealthy
+CLASS_MAP_EXPECTED = {0, 1, 2}
 
 def get_image_model():
     global _image_model
     if _image_model is None:
+        # Load the trained CNN model for image classification
         _image_model = tf.keras.models.load_model(MODEL_PATH)
     return _image_model
 
@@ -58,6 +57,10 @@ def predict_aqi_from_image(image_file):
         model = get_image_model()
         preds = model.predict(img_array)
         pred_class_idx = int(np.argmax(preds[0]))
+        
+        # Map class 3 (if predicted) to Unhealthy — only 3 classes used
+        if pred_class_idx not in CLASS_MAP_EXPECTED:
+            pred_class_idx = 2
         
         # Map prediction index to metadata
         res = CLASS_MAP.get(pred_class_idx, CLASS_MAP[1]) # Default to Moderate if mismatch

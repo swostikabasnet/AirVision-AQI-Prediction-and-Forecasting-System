@@ -20,9 +20,12 @@ from .aqi_data import (
     normalize_city,
     status_class,
     aqi_status,
+    pm25_to_aqi,
     make_forecast_item,
     build_city_cards,
     get_city_data,
+    load_pm25_window,
+    update_pm25_window,
     ADVICE_MAP,
     MODEL_CITIES,
 )
@@ -30,7 +33,7 @@ from .aqi_data import (
 User = get_user_model()
 
 # AQI Prediction API Endpoint (GET /predict-aqi/) without login
-
+# predict gareko result webpage ma dekhauxa 
 @require_GET
 def predict_aqi_ajax(request):
 
@@ -43,11 +46,16 @@ def predict_aqi_ajax(request):
             district = ""
         days = _parse_int(request.GET.get("days"), 7)
 
-        prediction = predict_next_day(x1, x2, x3, district=district or None)
+        # Predict next day's PM2.5 and AQI using the district model
+        prediction_pm25 = predict_next_day(x1, x2, x3, district=district or None)
+        prediction = pm25_to_aqi(prediction_pm25)
+
+        # Store the predicted PM2.5 so next page load sees updated values
+        update_pm25_window(district or "lalitpur", prediction_pm25)
         
-        # Compute forecast recursively
-        forecast_result = predict_pm25_forecast(district or "bhaktapur", x1, x2, x3, days=days)
-        forecast_values = [round(float(v)) for v in forecast_result.get('forecast_values', [])]
+        # Predict the next 7 days' PM2.5 and AQI forecast using the district model
+        forecast_result = predict_pm25_forecast(district or "lalitpur", x1, x2, x3, days=days)
+        forecast_values = [pm25_to_aqi(float(v)) for v in forecast_result.get('forecast_values', [])]
         labels = get_next_days_labels(days)
         forecast_items = [make_forecast_item(labels[i], v) for i, v in enumerate(forecast_values)]
 
@@ -93,27 +101,25 @@ def _prepare_model_forecast(city, x1, x2, x3, days=7):
     if city_key not in MODEL_CITIES:
         return None
     try:
-        # Call the Linear Regression predictor logic
         result = predict_pm25_forecast(city_key, x1, x2, x3, days=days)
-        forecast_values = [round(float(value)) for value in result.get('forecast_values', [])]
+        forecast_values = [pm25_to_aqi(float(value)) for value in result.get('forecast_values', [])]
         labels = get_next_days_labels(days)
         return {
-            'next_day': round(float(result.get('next_day', 0))),
+            'next_day': pm25_to_aqi(float(result.get('next_day', 0))),
             'forecast': [make_forecast_item(labels[i], value) for i, value in enumerate(forecast_values[:days])],
         }
     except Exception:
         return None
 
-# Extracts input features (x1, x2, x3) from GET query params, falling back to defaults if not provided
+# Extracts input features (x1, x2, x3) from GET query params, falling back to stored PM2.5 window
 def _get_last_window(request, city):
     x1 = _parse_float(request.GET.get('x1'), None)
     x2 = _parse_float(request.GET.get('x2'), None)
     x3 = _parse_float(request.GET.get('x3'), None)
     if x1 is not None and x2 is not None and x3 is not None:
         return x1, x2, x3
-    city_data = get_city_data(city)
-    pm25 = city_data.get('pm25', 40)
-    return pm25, max(pm25 - 5, 1), max(pm25 - 10, 1)
+    window = load_pm25_window(city)
+    return window[0], window[1], window[2]
 
 def _redirect_to_supported_city(page='aqi'):
     return redirect(f'/{page}/{MODEL_CITIES[0]}/')
@@ -123,17 +129,17 @@ def _redirect_to_supported_city(page='aqi'):
 
 # Landing / Home Page View
 def landing_page(request):
-    if request.method == 'POST':
-        image = request.FILES.get('image')
-        if image:
-            # Predict AQI from the sky image using MobileNet model prediction
-            prediction = predict_aqi_from_image(image)
-            request.session['filename'] = image.name
-            request.session['result'] = f"AQI: {prediction['predicted_aqi']} ({prediction['status']})"
-        return redirect('landing_page')
+    # if request.method == 'POST':
+    #     image = request.FILES.get('image')
+    #     if image:
+    #         # Predict AQI from the sky image using MobileNet model prediction
+    #         prediction = predict_aqi_from_image(image)
+    #         request.session['filename'] = image.name
+    #         request.session['result'] = f"AQI: {prediction['predicted_aqi']} ({prediction['status']})"
+    #     return redirect('landing_page')
         
-    filename = request.session.pop('filename', None)
-    result = request.session.pop('result', None)
+    # filename = request.session.pop('filename', None)
+    # result = request.session.pop('result', None)
     
     # Renders baseline major district cards at the bottom using static values
     city_cards = build_city_cards()
@@ -151,19 +157,11 @@ def landing_page(request):
     #To calculate the average aqi across all cities, we sum the AQI values and divide by the number of cities
     avg_aqi = round(sum(c["aqi"] for c in city_cards) / len(city_cards))
     
-    sorted_cities = sorted(
-    city_cards,
-    key=lambda x: x["aqi"],
-    reverse=True
-)
     return render(request, 'landing_page.html', {
-        'filename': filename,
-        'result': result,
         'city_cards': city_cards,
         'worst_city': worst_city,
         'best_city': best_city,
         'avg_aqi': avg_aqi,
-        'sorted_cities': sorted_cities,
     })
 
 # User Dashboard View
@@ -356,8 +354,16 @@ def aqi_view(request, city):
     data = get_city_data(city_lower)
     last_window = _get_last_window(request, city_lower)
     days = _parse_int(request.GET.get('days'), 7)
-    model_result = _prepare_model_forecast(city_lower, *last_window, days=days)
     x1, x2, x3 = last_window
+
+    # Predict and update stored window( AQI page)
+    try:
+        raw = predict_pm25_forecast(city_lower, x1, x2, x3, days=days)
+        update_pm25_window(city_lower, raw.get('next_day', x3))
+    except Exception:
+        pass
+
+    model_result = _prepare_model_forecast(city_lower, x1, x2, x3, days=days)
     
     if model_result:
         forecast_list = model_result['forecast']
@@ -381,16 +387,16 @@ def aqi_view(request, city):
     return render(request, 'aqi.html', {
         'city': city.capitalize(),
         'aqi': dynamic_aqi,
-        'pm25': round(x3, 2),
+        'pm25': round(x3, 2), #pm 2.5 value
         'status': dynamic_status,
         'status_class': dynamic_status_class,
         'advice': dynamic_advice,
         'forecast': forecast_list,
         'next_day': next_day,
         'forecast_source': 'model',
-        'x1': x1,
-        'x2': x2,
-        'x3': x3,
+        'x1': x1, #3 days ago
+        'x2': x2, #2 days ago
+        'x3': x3, # yesterday = pm 2.5 concentartion display
         'days': days,
     })
 
@@ -404,8 +410,16 @@ def forecast_view(request, city):
     city_data = get_city_data(city_lower)
     last_window = _get_last_window(request, city_lower)
     days = _parse_int(request.GET.get('days'), 7)
-    model_result = _prepare_model_forecast(city_lower, *last_window, days=days)
     x1, x2, x3 = last_window
+
+    # Predict and update stored window(forecast page)
+    try:
+        raw = predict_pm25_forecast(city_lower, x1, x2, x3, days=days)
+        update_pm25_window(city_lower, raw.get('next_day', x3))
+    except Exception:
+        pass
+
+    model_result = _prepare_model_forecast(city_lower, x1, x2, x3, days=days)
     
     if model_result:
         forecast_list = model_result['forecast']
@@ -443,7 +457,7 @@ def forecast_view(request, city):
 def search_view(request):
     city = normalize_city(request.GET.get('city', ''))
     if city not in MODEL_CITIES:
-        city = MODEL_CITIES[0] if MODEL_CITIES else 'bhaktapur'
+        city = MODEL_CITIES[0] if MODEL_CITIES else 'lalitpur'
     return redirect(f'/aqi/{city}/')
 
 # External REST API prediction query endpoint (GET /predict/)

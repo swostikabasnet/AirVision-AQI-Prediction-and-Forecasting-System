@@ -1,39 +1,27 @@
 # --- STATIC DISTRICT BASELINE DATA & CONFIGURATION ---
 CITY_AQI_DATA = {
-    "bhaktapur": {
-        "aqi": 70,
-        "pm25": 28,
-        "status": "Moderate",
+    "lalitpur": {
+        "pm25": 43,
         "advice": "Moderate air quality. Sensitive groups should be cautious during prolonged outdoor activity."
     },
-    "kathmandu": {
-        "aqi": 125,
-        "pm25": 45,
-        "status": "Unhealthy",
+    "bhaktapur": {
+        "pm25": 50,
         "advice": "Reduce outdoor activities. Wear a mask when going outside."
     },
-    "nepalgunj": {
-        "aqi": 95,
-        "pm25": 35,
-        "status": "Moderate",
+    "kathmandu": {
+        "pm25": 53,
         "advice": "Sensitive groups should limit prolonged outdoor exertion."
     },
-    "biratnagar": {
-        "aqi": 58,
-        "pm25": 24,
-        "status": "Moderate",
+    "dhankuta": {
+        "pm25": 27,
         "advice": "Moderate air quality. Sensitive groups should be cautious."
     },
-    "dhangadhi": {
-        "aqi": 88,
-        "pm25": 30,
-        "status": "Moderate",
+    "kanchanpur": {
+        "pm25": 37,
         "advice": "Moderate air quality. Stay aware of outdoor activity levels."
     },
-    "surkhet": {
-        "aqi": 48,
-        "pm25": 15,
-        "status": "Good",
+    "dang": {
+        "pm25": 33,
         "advice": "Air quality is good. Enjoy outdoor activities freely."
     },
 }
@@ -45,7 +33,7 @@ ADVICE_MAP = {
 }
 
 # The list of cities supported by the machine learning models
-MODEL_CITIES = ["bhaktapur", "kathmandu", "nepalgunj", "biratnagar", "dhangadhi", "surkhet"]
+MODEL_CITIES = ["lalitpur", "bhaktapur", "kathmandu", "dhankuta", "kanchanpur", "dang"]
 
 def normalize_city(city: str) -> str:
     return city.strip().lower() if city else ""
@@ -61,6 +49,29 @@ def status_class(status: str) -> str:
     if "good" in status_lower:
         return "good"
     return status_lower
+
+# PM2.5 (µg/m³) to AQI conversion using EPA 24-hour breakpoints
+
+PM25_BREAKPOINTS = [
+    (0.0, 12.0, 0, 50),
+    (12.1, 35.4, 51, 100),
+    (35.5, 55.4, 101, 150),
+    (55.5, 150.4, 151, 200),
+    (150.5, 250.4, 201, 300),
+    (250.5, 500.4, 301, 500),
+]
+
+# predict gareko pm2.5 lai aqi ma convert garne function
+def pm25_to_aqi(pm25: float) -> int:
+    if pm25 < 0:
+        return 0
+    if pm25 > 500.4:
+        return 500
+    for c_low, c_high, a_low, a_high in PM25_BREAKPOINTS:
+        if c_low <= pm25 <= c_high:
+            aqi_val = ((a_high - a_low) / (c_high - c_low)) * (pm25 - c_low) + a_low
+            return round(aqi_val)
+    return 500
 
 # AQI status based on the AQI value
 def aqi_status(aqi: int) -> str:
@@ -90,21 +101,24 @@ def enrich_forecast(forecast_list):
         for item in forecast_list
     ]
 
-# Builds district cards dynamically for dashboard/landing pages
+# Builds district cards dynamically for dashboard/landing pages using stored window + model predictions
 def build_city_cards():
+    from .predictor import predict_next_day
     cards = []
     for city in MODEL_CITIES:
-        data = CITY_AQI_DATA.get(city, {
-            "aqi": 85,
-            "pm25": 40,
-            "status": "Moderate",
-            "advice": "Monitor air quality conditions.",
-        })
+        window = load_pm25_window(city)
+        try:
+            pred_pm25 = predict_next_day(window[0], window[1], window[2], district=city)
+            aqi_val = pm25_to_aqi(pred_pm25)
+            update_pm25_window(city, pred_pm25)
+        except Exception:
+            aqi_val = pm25_to_aqi(window[0])
+        status = aqi_status(aqi_val)
         cards.append({
             "city": city.capitalize(),
-            "aqi": data["aqi"],
-            "status": data["status"],
-            "status_class": status_class(data["status"]),
+            "aqi": aqi_val,
+            "status": status,
+            "status_class": status_class(status),
         })
     return cards
 
@@ -116,3 +130,44 @@ def get_city_data(city: str):
         "status": "Moderate",
         "advice": "Monitor air quality conditions.",
     })
+
+import json
+from pathlib import Path
+
+_STORAGE_PATH = Path(__file__).parent / "pm25_windows.json"
+
+_INITIAL_WINDOWS = {
+    "lalitpur":  [43, 43, 43],
+    "bhaktapur": [50, 50, 50],
+    "kathmandu": [53, 53, 53],
+    "dhankuta":  [27, 27, 27],
+    "kanchanpur":[37, 37, 37],
+    "dang":      [33, 33, 33],
+}
+
+def _ensure_storage():
+    if not _STORAGE_PATH.exists():
+        data = {d: {"window": w, "updated": ""} for d, w in _INITIAL_WINDOWS.items()}
+        with open(_STORAGE_PATH, "w") as f:
+            json.dump(data, f, indent=2)
+
+def load_pm25_window(district: str):
+    _ensure_storage()
+    with open(_STORAGE_PATH) as f:
+        data = json.load(f)
+    entry = data.get(district)
+    if entry and entry.get("window"):
+        return entry["window"]
+    return _INITIAL_WINDOWS.get(district, [40, 40, 40])
+
+def update_pm25_window(district: str, new_pm25: float): # naya predict gareko value halera shift garxa 
+    _ensure_storage()
+    with open(_STORAGE_PATH) as f:
+        data = json.load(f)
+    entry = data.get(district, {})
+    window = entry.get("window", _INITIAL_WINDOWS.get(district, [40, 40, 40]))
+    window = [round(window[1], 1), round(window[2], 1), round(new_pm25, 1)]
+    import datetime
+    data[district] = {"window": window, "updated": str(datetime.date.today())}
+    with open(_STORAGE_PATH, "w") as f:
+        json.dump(data, f, indent=2)

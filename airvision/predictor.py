@@ -4,9 +4,9 @@ def predict_next_day(x1, x2, x3, district=None):
     """
     Predict next day's PM2.5 value using previous 3 days, district-wise.
     """
-    model = get_district_model(district or "bhaktapur")
+    model = get_district_model(district or "lalitpur")
     if model is None:
-        model = get_district_model("bhaktapur")
+        model = get_district_model("lalitpur")
     if model is None:
         model = get_district_model('')
     if model is None:
