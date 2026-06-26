@@ -2,27 +2,33 @@
 CITY_AQI_DATA = {
     "lalitpur": {
         "pm25": 43,
-        "advice": "Moderate air quality. Sensitive groups should be cautious during prolonged outdoor activity."
+        "aqi": 119,
+        "status": "Unhealthy",
     },
     "bhaktapur": {
         "pm25": 50,
-        "advice": "Reduce outdoor activities. Wear a mask when going outside."
+        "aqi": 128,
+        "status": "Unhealthy",
     },
     "kathmandu": {
         "pm25": 53,
-        "advice": "Sensitive groups should limit prolonged outdoor exertion."
+        "aqi": 132,
+        "status": "Unhealthy",
     },
     "dhankuta": {
         "pm25": 27,
-        "advice": "Moderate air quality. Sensitive groups should be cautious."
+        "aqi": 82,
+        "status": "Moderate",
     },
     "kanchanpur": {
         "pm25": 37,
-        "advice": "Moderate air quality. Stay aware of outdoor activity levels."
+        "aqi": 105,
+        "status": "Unhealthy",
     },
     "dang": {
         "pm25": 33,
-        "advice": "Air quality is good. Enjoy outdoor activities freely."
+        "aqi": 95,
+        "status": "Moderate",
     },
 }
 

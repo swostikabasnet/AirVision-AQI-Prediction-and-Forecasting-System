@@ -377,12 +377,13 @@ def aqi_view(request, city):
         dynamic_aqi = round(next_day)
         dynamic_status = aqi_status(dynamic_aqi)
         dynamic_status_class = status_class(dynamic_status)
-        dynamic_advice = "The air quality index is forecasted to be " + dynamic_status.lower() + " tomorrow. " + ADVICE_MAP.get(dynamic_status_class, "")
+        dynamic_advice = ADVICE_MAP.get(dynamic_status_class, "Monitor air quality conditions.")
     else:
-        dynamic_aqi = data['aqi']
-        dynamic_status = data['status']
-        dynamic_status_class = status_class(data['status'])
-        dynamic_advice = data['advice']
+        pm25_val = data.get('pm25', 0)
+        dynamic_aqi = pm25_to_aqi(pm25_val)
+        dynamic_status = aqi_status(dynamic_aqi)
+        dynamic_status_class = status_class(dynamic_status)
+        dynamic_advice = ADVICE_MAP.get(dynamic_status_class, "Monitor air quality conditions.")
 
     return render(request, 'aqi.html', {
         'city': city.capitalize(),
@@ -437,6 +438,12 @@ def forecast_view(request, city):
         dynamic_aqi = city_data['aqi']
         dynamic_status = city_data['status']
         dynamic_status_class = status_class(city_data['status'])
+
+    # Prepend today's AQI as the first forecast card
+    weekday_names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    today_label = weekday_names[datetime.date.today().weekday()]
+    today_item = {"day": today_label, "aqi": dynamic_aqi, "status": dynamic_status, "status_class": dynamic_status_class}
+    forecast_list = [today_item] + (forecast_list[:days-1] if len(forecast_list) >= days else forecast_list)
 
     return render(request, 'forecast.html', {
         'city': city.capitalize(),

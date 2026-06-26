@@ -188,33 +188,7 @@
         }
         .btn-forecast:hover { background: #1d4ed8; color: #fff; transform: translateY(-1px); }
 
-        /* ── AQI Progress Bar Container ── */
-        .progress {
-            height: 10px;
-            border-radius: 999px;
-            background: #e5e7eb;
-            overflow: hidden;
-      }
-
-        /* inner bar */
-        .progress-bar {
-            height: 100%;
-            border-radius: 999px;
-            transition: width 0.5s ease;
-      }
-
-        .bg-good {
-            background: #16a34a;
-        }
-
-        .bg-moderate {
-          background: #d97706;
-        }
-
-        .bg-unhealthy {
-          background: #dc2626;
-        }
-
+        
         /* ── Insights Cards ── */
         .insight-card {
             background: #fff; border-radius: 16px; border: 1px solid #e2e8f0;
@@ -267,7 +241,7 @@
 <!-- ── Hero ── -->
 <section class="hero">
     <div class="hero-eyebrow"><i class="bi bi-wind me-1"></i>Air Quality Monitoring</div>
-    <h1>Live Air Quality &amp;<br><span>7-Day Forecasts</span> for Nepal</h1>
+    <h1>Air Quality Index &amp;<br><span>7-Day Forecast</span> for Nepal</h1>
     <p>Real-time AQI Prediction and Forecasting for major districts across Nepal</p>
     <div class="hero-btns">
         <a href="#live-aqi" class="btn-hero-outline"><i class="bi bi-bar-chart-fill me-1"></i> View Live AQI</a>
@@ -308,7 +282,6 @@
 
             <div class="col-md-4">
                 <div class="insight-card unhealthy">
-                    <div class="insight-icon"><i class="bi bi-arrow-up-circle-fill" style="color:#ef4444;"></i></div>
                     <div class="insight-label">Worst</div>
                     <div class="insight-value unhealthy">{{ worst_city.aqi }}</div>
                     <div class="insight-city">{{ worst_city.city }}</div>
@@ -317,7 +290,6 @@
 
             <div class="col-md-4">
                 <div class="insight-card good">
-                    <div class="insight-icon"><i class="bi bi-arrow-down-circle-fill" style="color:#22c55e;"></i></div>
                     <div class="insight-label">Cleanest</div>
                     <div class="insight-value good">{{ best_city.aqi }}</div>
                     <div class="insight-city">{{ best_city.city }}</div>
@@ -326,7 +298,6 @@
 
             <div class="col-md-4">
                 <div class="insight-card moderate">
-                    <div class="insight-icon"><i class="bi bi-dash-circle-fill" style="color:#d97706;"></i></div>
                     <div class="insight-label">Average</div>
                     <div class="insight-value moderate">{{ avg_aqi }}</div>
                     <div class="insight-city">Across {{ city_cards|length }} districts</div>
