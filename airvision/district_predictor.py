@@ -44,6 +44,7 @@ def get_district_model(district):
         _district_models[district_key] = model
     return _district_models[district_key]
 
+# Predicts the next day's PM2.5 value and a 7-day forecast for a given district using the provided lag features (x1, x2, x3).
 def predict_pm25_forecast(district, x1, x2, x3, days=7):
     model = get_district_model(district or "bhaktapur")
     if model is None:
@@ -53,7 +54,7 @@ def predict_pm25_forecast(district, x1, x2, x3, days=7):
     if model is None:
         raise ValueError(f"No model found for district: {district}")
     
-    # Forecast the next day's PM2.5 value using the provided lag features
+    # Forecast the next day's PM2.5 value using the provided lag features(Model Prediction)
     try:
         cols = ['PM25_Lag1', 'PM25_Lag2', 'PM25_Lag3']
         df_input = pd.DataFrame([[x1, x2, x3]], columns=cols)

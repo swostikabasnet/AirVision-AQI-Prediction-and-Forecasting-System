@@ -258,7 +258,7 @@
                     <div class="col-6">
                         <div class="info-box">
                             <div class="info-label">PM2.5 Concentration</div>
-                            <div class="info-value">{{ pm25 }} µg/m³</div>
+                            <div class="info-value" id="pm25Display">{{ pm25 }} µg/m³</div>
                         </div>
                     </div>
 
@@ -269,30 +269,30 @@
             <div class="col-lg-6">
                 <div class="input-panel">
                     <p class="section-label" style="color:#3b82f6;">Model Inputs (PM2.5)</p>
-                    <form method="GET" action="" id="forecastForm">
+                    <div id="forecastForm">
                         <div class="row g-2 mb-3">
                             <div class="col-4">
                                 <label for="x1" class="d-block mb-1">3 Days Ago</label>
-                                <input type="number" step="any" class="form-control" id="x1" name="x1" value="{{ x1|floatformat:1 }}" readonly>
+                                <input type="text" class="form-control" id="x1" value="{{ x1|floatformat:1 }}" readonly>
                             </div>
                             <div class="col-4">
                                 <label for="x2" class="d-block mb-1">2 Days Ago</label>
-                                <input type="number" step="any" class="form-control" id="x2" name="x2" value="{{ x2|floatformat:1 }}" readonly>
+                                <input type="text" class="form-control" id="x2" value="{{ x2|floatformat:1 }}" readonly>
                             </div>
                             <div class="col-4">
                                 <label for="x3" class="d-block mb-1">Yesterday</label>
-                                <input type="number" step="any" class="form-control" id="x3" name="x3" value="{{ x3|floatformat:1 }}" readonly>
+                                <input type="text" class="form-control" id="x3" value="{{ x3|floatformat:1 }}" readonly>
                             </div>
                             <div class="col-12 mt-2">
                             <label for="days" class="text-muted mb-1 d-block" style="font-size: 9px; font-weight: 700; text-transform: uppercase;">Forecast Duration</label>
                             <div class="form-control form-control-sm rounded-3 border bg-light">7 Days</div>
-                            <input type="hidden" name="days" id="days" value="7">
+                            <input type="hidden" id="days" value="7">
                         </div>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100" style="font-size:13px; padding:8px;">
+                        <button type="button" class="btn btn-primary w-100" style="font-size:13px; padding:8px;" id="recalcBtn">
                             Recalculate Forecast
                         </button>
-                    </form>
+                    </div>
                 </div>
             </div>
 
@@ -322,8 +322,9 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-document.getElementById('forecastForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+
+// Recalculate Forecast Button Click Event
+document.getElementById('recalcBtn').addEventListener('click', function() {
     let x1 = document.getElementById('x1').value;
     let x2 = document.getElementById('x2').value;
     let x3 = document.getElementById('x3').value;
@@ -349,10 +350,10 @@ document.getElementById('forecastForm').addEventListener('submit', function(e) {
                     </div>
                     <p style="color:#64748b; margin-top:8px; font-size:14px;">Predicted Next Day AQI</p>
                 `,
-                confirmButtonText: 'Generate Forecast',
+                confirmButtonText: 'Recalculate Forecast',
                 confirmButtonColor: '#2563eb'
             }).then(() => {
-                document.getElementById('forecastForm').submit();
+                location.reload();
             });
         })
         .catch(error => {

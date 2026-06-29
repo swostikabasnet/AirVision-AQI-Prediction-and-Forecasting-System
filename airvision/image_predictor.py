@@ -45,6 +45,8 @@ def predict_aqi_from_image(image_file):
     """
     try:
         # Load and preprocess image
+        if hasattr(image_file, 'seek'):
+            image_file.seek(0)
         img = Image.open(image_file)
         img = img.convert('RGB')
         img = img.resize((150, 150))

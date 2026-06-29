@@ -1,3 +1,26 @@
+# Last 3 actual PM2.5 readings from the dataset (pm 2.5.xlsx) per district.
+# x1 = 3 days ago, x2 = 2 days ago, x3 = yesterday.
+ACTUAL_PM25_WINDOWS = {
+    "lalitpur":   (99.8, 60.8, 65.8),
+    "bhaktapur":  (40.9, 34.5, 69.4),
+    "kathmandu":  (19.1, 19.2,  4.4),
+    "dhankuta":   (15.1, 13.1, 38.0),
+    "kanchanpur":  (3.2,  4.2,  5.1),
+    "dang":       (57.5, 50.3, 63.9),
+}
+
+def get_actual_pm25_window(district: str):
+    return ACTUAL_PM25_WINDOWS.get(district)
+
+def load_district_window(district: str):
+    """Returns the last 3 actual PM2.5 readings from the dataset."""
+    actual = get_actual_pm25_window(district)
+    if actual:
+        return actual
+    data = get_city_data(district)
+    pm25 = data['pm25']
+    return pm25, pm25, pm25
+
 # --- STATIC DISTRICT BASELINE DATA & CONFIGURATION ---
 CITY_AQI_DATA = {
     "lalitpur": {
@@ -107,18 +130,17 @@ def enrich_forecast(forecast_list):
         for item in forecast_list
     ]
 
-# Builds district cards dynamically for dashboard/landing pages using stored window + model predictions
+# Builds district cards dynamically for dashboard/landing pages using dataset values
 def build_city_cards():
     from .predictor import predict_next_day
     cards = []
     for city in MODEL_CITIES:
-        window = load_pm25_window(city)
+        x1, x2, x3 = load_district_window(city)
         try:
-            pred_pm25 = predict_next_day(window[0], window[1], window[2], district=city)
+            pred_pm25 = predict_next_day(x1, x2, x3, district=city)
             aqi_val = pm25_to_aqi(pred_pm25)
-            update_pm25_window(city, pred_pm25)
         except Exception:
-            aqi_val = pm25_to_aqi(window[0])
+            aqi_val = pm25_to_aqi(x3)
         status = aqi_status(aqi_val)
         cards.append({
             "city": city.capitalize(),
@@ -137,43 +159,4 @@ def get_city_data(city: str):
         "advice": "Monitor air quality conditions.",
     })
 
-import json
-from pathlib import Path
 
-_STORAGE_PATH = Path(__file__).parent / "pm25_windows.json"
-
-_INITIAL_WINDOWS = {
-    "lalitpur":  [43, 43, 43],
-    "bhaktapur": [50, 50, 50],
-    "kathmandu": [53, 53, 53],
-    "dhankuta":  [27, 27, 27],
-    "kanchanpur":[37, 37, 37],
-    "dang":      [33, 33, 33],
-}
-
-def _ensure_storage():
-    if not _STORAGE_PATH.exists():
-        data = {d: {"window": w, "updated": ""} for d, w in _INITIAL_WINDOWS.items()}
-        with open(_STORAGE_PATH, "w") as f:
-            json.dump(data, f, indent=2)
-
-def load_pm25_window(district: str):
-    _ensure_storage()
-    with open(_STORAGE_PATH) as f:
-        data = json.load(f)
-    entry = data.get(district)
-    if entry and entry.get("window"):
-        return entry["window"]
-    return _INITIAL_WINDOWS.get(district, [40, 40, 40])
-
-def update_pm25_window(district: str, new_pm25: float): # naya predict gareko value halera shift garxa 
-    _ensure_storage()
-    with open(_STORAGE_PATH) as f:
-        data = json.load(f)
-    entry = data.get(district, {})
-    window = entry.get("window", _INITIAL_WINDOWS.get(district, [40, 40, 40]))
-    window = [round(window[1], 1), round(window[2], 1), round(new_pm25, 1)]
-    import datetime
-    data[district] = {"window": window, "updated": str(datetime.date.today())}
-    with open(_STORAGE_PATH, "w") as f:
-        json.dump(data, f, indent=2)
