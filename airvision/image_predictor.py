@@ -3,6 +3,7 @@ import numpy as np
 import tensorflow as tf
 from PIL import Image
 
+# loading the trained CNN model
 _image_model = None
 MODEL_PATH = os.path.join(
     os.path.dirname(__file__),
@@ -34,7 +35,7 @@ CLASS_MAP_EXPECTED = {0, 1, 2}
 def get_image_model():
     global _image_model
     if _image_model is None:
-        # Load the trained CNN model for image classification
+        # Load the  model for image classification
         _image_model = tf.keras.models.load_model(MODEL_PATH)
     return _image_model
 
@@ -51,7 +52,7 @@ def predict_aqi_from_image(image_file):
         img = img.convert('RGB')
         img = img.resize((150, 150))
         
-        # Preprocess: rescale 1./255 and add batch dimension
+        # Preprocess the image for the model
         img_array = np.array(img) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
         
@@ -69,10 +70,5 @@ def predict_aqi_from_image(image_file):
         
         return res
     except Exception as e:
-        # Fallback to moderate in case of any processing errors
-        return {
-            "predicted_aqi": 75,
-            "status": "Moderate",
-            "health_advice": f"Error running classifier: {str(e)}. Defaulting to moderate."
-        }
+        return {"error": True, "message": str(e)}
 

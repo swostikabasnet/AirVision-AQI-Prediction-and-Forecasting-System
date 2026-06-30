@@ -6,6 +6,7 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
+from django.urls import reverse
 from django.views.decorators.http import require_GET
 
 from accounts.models import CustomUser, Prediction, AqiRecord
@@ -169,20 +170,23 @@ def user_dashboard(request):
         # Predict AQI from the sky image using MobileNet model prediction
         prediction = predict_aqi_from_image(fs.path(filename))
         
-        # Save prediction entry to the database
-        Prediction.objects.create(
-            user=request.user,
-            image=image,
-            predicted_aqi=prediction['predicted_aqi'],
-            pm25=None,
-            status=prediction['status'],
-            health_advice=prediction['health_advice'],
-        )
+        if prediction.get("error"):
+            messages.error(request, f"Image prediction failed: {prediction['message']}")
+        else:
+            Prediction.objects.create(
+                user=request.user,
+                image=filename,
+                predicted_aqi=prediction['predicted_aqi'],
+                pm25=None,
+                status=prediction['status'],
+                health_advice=prediction['health_advice'],
+            )
+            
+            request.session['image_url'] = image_url
+            request.session['aqi_result'] = prediction['predicted_aqi']
+            request.session['aqi_status'] = prediction['status']
+            request.session['health_advice'] = prediction['health_advice']
         
-        request.session['image_url'] = image_url
-        request.session['aqi_result'] = prediction['predicted_aqi']
-        request.session['aqi_status'] = prediction['status']
-        request.session['health_advice'] = prediction['health_advice']
         return redirect('user_dashboard')
         
     image_url = request.session.pop('image_url', None)
@@ -312,7 +316,8 @@ def delete_prediction(request, id):
         return redirect('admin_dashboard')
     if prediction.user == request.user:
         prediction.delete()
-        return redirect('user_dashboard')
+        messages.success(request, "Prediction deleted successfully.")
+        return redirect(reverse('user_dashboard') + '?section=history')
     return redirect('user_dashboard')
 
 @login_required

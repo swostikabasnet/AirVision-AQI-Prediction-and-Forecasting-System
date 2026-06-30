@@ -203,15 +203,7 @@
       AirVision
     </a>
     <div class="d-flex align-items-center gap-3">
-        <form method="GET" action="/search/" class="search-box d-none d-md-flex" style="margin:0;">
-            <input name="city" list="districts" type="text" placeholder="Search district...">
-            <datalist id="districts">
-                {% for card in city_cards %}
-                <option value="{{ card.city }}"></option>
-                {% endfor %}
-            </datalist>
-            <button type="submit" class="search-icon"><i class="bi bi-search"></i></button>
-        </form>
+        <a href="/" class="btn btn-primary">Home</a>
         
     </div>
     

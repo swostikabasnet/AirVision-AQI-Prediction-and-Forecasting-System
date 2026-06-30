@@ -13,7 +13,7 @@ class Prediction(models.Model):
     )
 
     image = models.ImageField(
-        upload_to='predictions/'
+        upload_to=''
     )
 
     predicted_aqi = models.IntegerField()

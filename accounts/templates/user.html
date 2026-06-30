@@ -479,18 +479,18 @@
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-label">Menu</div>
-        <button class="sidebar-link active" onclick="showSection('predict', this)">
+        <button class="sidebar-link active" data-section="predict" onclick="showSection('predict', this)">
             <i class="bi bi-cpu"></i> AQI Prediction
         </button>
-        <button class="sidebar-link" onclick="showSection('search', this)">
+        <button class="sidebar-link" data-section="search" onclick="showSection('search', this)">
             <i class="bi bi-search"></i> Search District
         </button>
-        <button class="sidebar-link" onclick="showSection('history', this)">
+        <button class="sidebar-link" data-section="history" onclick="showSection('history', this)">
             <i class="bi bi-clock-history"></i> My Predictions
         </button>
 
         <div class="sidebar-label">Account</div>
-        <button class="sidebar-link" onclick="showSection('profile', this)">
+        <button class="sidebar-link" data-section="profile" onclick="showSection('profile', this)">
             <i class="bi bi-person"></i> View Profile
         </button>
     </aside>
@@ -771,6 +771,20 @@
 
 
 <script>
+    // Handle section navigation based on URL parameter
+    window.addEventListener('DOMContentLoaded', function() {
+        var params = new URLSearchParams(window.location.search);
+        var section = params.get('section');
+        if (section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            var secEl = document.getElementById('section-' + section);
+            if (secEl) secEl.classList.add('active');
+            var btn = document.querySelector('.sidebar-link[data-section="' + section + '"]');
+            if (btn) btn.classList.add('active');
+        }
+    });
+
     // Sidebar navigation
     function showSection(name, btn) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
