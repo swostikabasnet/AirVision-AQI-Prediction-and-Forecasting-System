@@ -5,10 +5,11 @@
     <title>User Dashboard - AirVision</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
+        /* ── Body ── */
         body {
             background: #f4f7fb;
             font-family: Arial, sans-serif;
@@ -17,10 +18,11 @@
             min-height: 100vh;
         }
 
+        /* ── Navbar ── */
         .navbar-modern {
             background: #ffffff;
             border-bottom: 1px solid #e2e8f0;
-            padding: 0 28px;
+            padding: 13px 28px;
             height: 60px;
             display: flex;
             align-items: center;
@@ -35,9 +37,9 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            font-weight: 700;
-            font-size: 20px;
-            color: #1f2d3d;
+            font-weight: 800;
+            font-size: 22px;
+            color: #0f172a;
             text-decoration: none;
         }
 
@@ -62,6 +64,7 @@
             color: #dc2626;
         }
 
+        /* ── Sidebar ── */
         .layout { display: flex; flex: 1; }
 
         .sidebar {
@@ -114,7 +117,7 @@
             border-right: 3px solid #2563eb;
         }
 
-        .sidebar-link i { font-size: 16px; width: 18px; }
+        .sidebar-link i { font-size: 18px; width: 20px; }
 
         .main-content { flex: 1; padding: 28px; overflow-y: auto; }
 
@@ -125,9 +128,10 @@
         .section-header h2 { font-size: 20px; font-weight: 700; color: #1f2d3d; margin-bottom: 4px; }
         .section-header p { font-size: 13px; color: #94a3b8; }
 
+        /* ── Shared Card ── */
         .card-box {
             background: #ffffff;
-            border-radius: 14px;
+            border-radius: 20px;
             border: 1px solid #e2e8f0;
             padding: 24px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.05);
@@ -137,22 +141,74 @@
         .card-heading { font-size: 15px; font-weight: 700; color: #1f2d3d; margin-bottom: 4px; }
         .card-sub { font-size: 13px; color: #94a3b8; margin-bottom: 18px; }
 
-        .upload-wrapper { position: relative; }
+        /* ── AQI Prediction Section ── */
+        .predict-inner {
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .predict-card {
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            padding: 36px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .predict-card .card-heading {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2d3d;
+            margin-bottom: 4px;
+        }
+
+        .predict-card .card-sub {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 24px;
+        }
 
         .upload-area {
             border: 2px dashed #cbd5e1;
-            border-radius: 10px;
-            padding: 32px 20px;
+            border-radius: 12px;
+            padding: 36px 20px;
             text-align: center;
             background: #f8fafc;
-            transition: border-color 0.2s, background 0.2s;
+            transition: all 0.2s;
             cursor: pointer;
             display: block;
+            position: relative;
         }
 
-        .upload-area:hover { border-color: #2563eb; background: #eff6ff; }
-        .upload-area i { font-size: 30px; color: #94a3b8; margin-bottom: 10px; display: block; }
-        .upload-area p { font-size: 13px; color: #64748b; margin: 0; }
+        .upload-area:hover {
+            border-color: #2563eb;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            transform: scale(1.01);
+        }
+
+        .upload-area i {
+            font-size: 38px;
+            color: #2563eb;
+            display: block;
+            margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+
+        .upload-area:hover i {
+            transform: translateY(-4px);
+        }
+
+        .upload-area p {
+            font-size: 14px;
+            color: #1f2d3d;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .upload-area small {
+            font-size: 12px;
+            color: #94a3b8;
+        }
 
         .upload-area input[type="file"] {
             position: absolute;
@@ -163,33 +219,52 @@
             height: 100%;
         }
 
+        .upload-area.has-file {
+            border-color: #16a34a;
+            background: #f0fdf4;
+        }
+
+        .upload-area.has-file i {
+            color: #16a34a;
+        }
+
         .btn-predict {
-            width: 100%;
-            padding: 11px;
-            border-radius: 9px;
+            width: auto;
+            padding: 8px 24px;
+            border-radius: 8px;
             border: none;
             background: #2563eb;
             color: #fff;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.15s;
-            margin-top: 12px;
+            margin-top: 14px;
         }
 
         .btn-predict:hover { background: #1d4ed8; }
 
-        .result-aqi { font-size: 60px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+        .result-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 6px;
+        }
+
+        .result-aqi { font-size: 70px; font-weight: 800; line-height: 1; margin-bottom: 12px; letter-spacing: -2px; }
         .aqi-good      { color: #16a34a; }
         .aqi-moderate  { color: #d97706; }
         .aqi-unhealthy { color: #dc2626; }
 
         .status-badge {
             display: inline-block;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
-            padding: 4px 14px;
+            padding: 5px 18px;
             border-radius: 20px;
+            margin-bottom: 18px;
         }
 
         .status-good      { color: #16a34a; background: #f0fdf4; border: 1px solid #bbf7d0; }
@@ -198,9 +273,9 @@
 
         .health-box {
             border-radius: 10px;
-            padding: 14px 16px;
+            padding: 12px 16px;
             font-size: 13px;
-            line-height: 1.6;
+            line-height: 1.5;
             display: flex;
             gap: 10px;
             align-items: flex-start;
@@ -209,41 +284,90 @@
 
         .health-box i { font-size: 15px; flex-shrink: 0; margin-top: 2px; }
         .health-unhealthy { background: #fff1f2; color: #dc2626; border: 1px solid #fecdd3; }
-        .health-moderate  { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
-        .health-good      { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .health-moderate  { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+        .health-good      { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
 
-        .image-preview { border-radius: 10px; overflow: hidden; border: 1px solid #e2e8f0; }
-        .image-preview img { width: 100%; display: block; max-height: 200px; object-fit: cover; }
+        .image-preview { border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; margin-bottom: 24px; }
+        .image-preview img { width: 100%; display: block; max-height: 280px; object-fit: cover; }
 
-        .card-divider { border: none; border-top: 1px solid #f1f5f9; margin: 16px 0; }
+        .card-divider { border: none; border-top: 1px solid #f1f5f9; margin: 20px 0; }
 
-        .search-row { display: flex; gap: 8px; margin-bottom: 20px; }
-        .search-row input { flex: 1; padding: 9px 14px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 14px; outline: none; }
-        .search-row input:focus { border-color: #2563eb; }
+        /* ── Search District Section ── */
+        .search-box { position: relative; width: 240px; }
+        .search-box input {
+            width: 100%;
+            padding: 8px 36px 8px 14px;
+            border-radius: 22px;
+            border: 1px solid #e2e8f0;
+            outline: none;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search-box input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+        .search-icon {
+            position: absolute; right: 11px; top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8; background: none;
+            border: none; padding: 0; cursor: pointer; font-size: 14px;
+        }
 
-        .btn-search {
-            padding: 9px 18px;
-            border-radius: 8px;
+        .district-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .district-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 22px 16px 16px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(15,23,42,0.05);
+            transition: transform 0.22s ease, box-shadow 0.22s ease;
+        }
+
+        .district-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 36px rgba(15,23,42,0.11);
+        }
+
+        .district-card .d-name { font-size: 14px; font-weight: 700; color: #334155; margin-bottom: 10px; text-transform: capitalize; }
+        .district-card .d-aqi { font-size: 44px; font-weight: 800; line-height: 1; margin-bottom: 8px; letter-spacing: -1px; }
+
+        .btn-forecast-sm {
+            display: block;
+            width: 100%;
+            margin-top: 14px;
+            padding: 9px;
+            border-radius: 10px;
             border: none;
             background: #2563eb;
             color: #fff;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            cursor: pointer;
-            transition: background 0.15s;
             text-decoration: none;
+            text-align: center;
+            transition: background 0.18s, transform 0.15s;
         }
 
-        .btn-search:hover { background: #1d4ed8; color: #fff; }
+        .btn-forecast-sm:hover { background: #1d4ed8; color: #fff; transform: translateY(-1px); }
 
+        /* ── Prediction History ── */
         .btn-action {
-            padding: 5px 12px;
-            border-radius: 6px;
+            padding: 6px 14px;
+            border-radius: 8px;
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             border: none;
-            transition: background 0.15s;
+            transition: all 0.15s;
             text-decoration: none;
             display: inline-block;
         }
@@ -255,98 +379,89 @@
 
         .btn-blue:hover {
             background:  #dbeafe;
-            color: #2563eb;
+            color: #1d4ed8;
         }
 
         .btn-red {
             background: #fff1f2;
             color: #dc2626;
-           
         }
 
         .btn-red:hover {
             background:#fee2e2;
-            color: #dc2626;
+            color: #b91c1c;
         }
 
-        .district-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 14px;
-        }
+        .history-table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; font-size: 13px; }
 
-        .district-card {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 18px 16px;
-            text-align: center;
-        }
-
-        .district-card .d-name { font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 8px; }
-        .district-card .d-aqi { font-size: 36px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
-
-        .btn-forecast-sm {
-            display: block;
-            margin-top: 12px;
-            padding: 7px;
-            border-radius: 7px;
-            border: none;
-            background: #2563eb;
-            color: #fff;
-            font-size: 12px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: background 0.15s;
-        }
-
-        .btn-forecast-sm:hover { background: #1d4ed8; color: #fff; }
-
-        .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-
-        .history-table th {
-            text-align: left;
+        .history-table thead th {
             font-size: 11px;
             font-weight: 700;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 0 12px 12px 0;
-            border-bottom: 1px solid #f1f5f9;
+            letter-spacing: 0.8px;
+            padding: 0 12px 14px 12px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .history-table thead th:first-child { padding-left: 0; }
+        .history-table thead th:last-child { padding-right: 0; }
+
+        .history-table tbody tr {
+            transition: background 0.15s;
+        }
+
+        .history-table tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .history-table tbody tr:hover {
+            background: #f1f5f9;
         }
 
         .history-table td {
-            padding: 12px 12px 12px 0;
-            border-bottom: 1px solid #f8fafc;
+            padding: 12px;
+            border-bottom: 1px solid #f1f5f9;
             color: #1f2d3d;
             vertical-align: middle;
         }
 
-        .history-table tr:last-child td { border-bottom: none; }
+        .history-table td:first-child { padding-left: 0; }
+        .history-table td:last-child { padding-right: 0; }
+
+        .history-table tbody tr:last-child td {
+            border-bottom: none;
+        }
 
         .history-thumb {
-            width: 44px;
-            height: 44px;
-            border-radius: 8px;
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
             object-fit: cover;
             border: 1px solid #e2e8f0;
             cursor: pointer;
+            transition: opacity 0.15s;
+        }
+
+        .history-thumb:hover {
+            opacity: 0.8;
         }
 
         .history-aqi { font-weight: 700; font-size: 15px; }
 
-        /* Profile */
+        /* ── View Profile ── */
         .profile-avatar {
             width: 72px;
             height: 72px;
             border-radius: 50%;
-            background: #2563eb;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
             color: #fff;
             font-size: 28px;
             font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 4px 12px rgba(37,99,235,0.25);
         }
 
         .profile-name { font-size: 18px; font-weight: 700; color: #1f2d3d; margin-bottom: 4px; }
@@ -355,17 +470,17 @@
         .stat-box {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 16px;
+            border-radius: 12px;
+            padding: 18px 20px;
             text-align: center;
             display: inline-block;
-            min-width: 140px;
+            min-width: 160px;
         }
 
-        .stat-num { font-size: 28px; font-weight: 700; color: #2563eb; line-height: 1; margin-bottom: 4px; }
-        .stat-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+        .stat-num { font-size: 30px; font-weight: 800; color: #2563eb; line-height: 1; margin-bottom: 4px; }
+        .stat-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
 
-        /* Edit profile form */
+        /* ── Edit Profile Form ── */
         .form-label-sm {
             font-size: 12px;
             font-weight: 600;
@@ -461,7 +576,7 @@
 <!-- Navbar -->
 <nav class="navbar-modern">
     <a href="/" class="brand">
-        <div style="display:flex;align-items:flex-end;gap:3px;">
+        <div style="display:flex; align-items:flex-end; gap:3px;">
             <span style="display:block;width:5px;height:14px;border-radius:3px;background:#bfdbfe;"></span>
             <span style="display:block;width:5px;height:20px;border-radius:3px;background:#93c5fd;"></span>
             <span style="display:block;width:5px;height:28px;border-radius:3px;background:#2563eb;"></span>
@@ -509,56 +624,60 @@
         <!-- AQI Prediction -->
         <div class="section active" id="section-predict">
             <div class="section-header">
-                <h2>AQI Prediction</h2>
+                <h2><i class="bi bi-cpu me-2" style="color:#2563eb;"></i>AQI Prediction</h2>
                 <p>Upload an image to predict the Air Quality Index</p>
             </div>
 
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="card-box">
-                        <div class="card-heading">Upload Image</div>
-                        
-
-                        <form method="POST" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <div class="upload-wrapper">
-                                <label class="upload-area">
-                                    <i class="bi bi-cloud-arrow-up"></i>
-                                    <p><strong>Click to upload</strong></p>
-                                    <small id="file-name" style="display:block;margin-top:8px;color:#94a3b8;">No file selected</small>
-                                    <input type="file" name="image" accept="image/*"
-                                           onchange="document.getElementById('file-name').textContent = this.files[0]?.name || 'No file selected'">
-                                </label>
-                            </div>
-                            <div class="text-center mt-3">
-                                <button type="submit" class="btn btn-primary px-4">Predict AQI</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
+            <div class="predict-inner">
                 {% if image_url %}
-                <div class="col-md-6">
-                    <div class="card-box text-center">
-                        <div class="card-heading mb-3">Prediction Result</div>
-                        <div class="image-preview mb-3">
-                            <img src="{{ image_url }}" alt="Uploaded image">
-                        </div>
-                        <div style="font-size:11px;color:#94a3b8;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:4px;">AQI Score</div>
-                        <div class="result-aqi aqi-{{ aqi_status_class }}">{{ aqi_result }}</div>
-                        <div class="status-badge status-{{ aqi_status_class }}">{{ aqi_status }}</div>
-                        <hr class="card-divider">
-                        <div class="health-box health-{{ aqi_status_class }}">
-                            {% if aqi_status_class == 'good' %}
-                            <i class="bi bi-check-circle-fill"></i>
-                            {% elif aqi_status_class == 'moderate' %}
-                            <i class="bi bi-exclamation-circle-fill"></i>
-                            {% else %}
-                            <i class="bi bi-exclamation-triangle-fill"></i>
-                            {% endif %}
-                            <div><strong>Health Advice:</strong> {{ health_advice }}</div>
-                        </div>
+                <div class="predict-card text-center" style="padding-top:28px;">
+                    <div class="card-heading" style="margin-bottom:0;">Prediction Result</div>
+
+                    <div class="image-preview" style="margin-top:20px;">
+                        <img src="{{ image_url }}" alt="Uploaded image">
                     </div>
+
+                    <div class="result-label">AQI Score</div>
+                    <div class="result-aqi aqi-{{ aqi_status_class }}">{{ aqi_result }}</div>
+                    <div class="status-badge status-{{ aqi_status_class }}">{{ aqi_status }}</div>
+
+                    <hr class="card-divider" style="margin:16px 0 14px;">
+
+                    <div class="health-box health-{{ aqi_status_class }}">
+                        {% if aqi_status_class == 'good' %}
+                        <i class="bi bi-check-circle-fill"></i>
+                        {% elif aqi_status_class == 'moderate' %}
+                        <i class="bi bi-exclamation-circle-fill"></i>
+                        {% else %}
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        {% endif %}
+                        <div><strong>Health Advice:</strong> {{ health_advice }}</div>
+                    </div>
+
+                    <a href="{% url 'user_dashboard' %}" class="btn btn-primary px-4" style="border-radius:8px;font-size:13px;font-weight:600;padding:7px 20px;text-decoration:none;display:inline-block;margin-top:24px;">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>New Prediction
+                        </a>
+                </div>
+                {% else %}
+                <div class="predict-card">
+                    <div class="card-heading">Upload Image</div>
+                    <div class="card-sub">Choose a sky image to analyze air quality</div>
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <label class="upload-area">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                            <p><strong>Choose an image</strong></p>
+                            <small id="file-name">No file selected</small>
+                            <input type="file" name="image" accept="image/*"
+                                   onchange="var el = document.getElementById('file-name'); var area = this.closest('.upload-area'); el.textContent = this.files[0]?.name || 'No file selected'; if (this.files[0]) { area.classList.add('has-file'); } else { area.classList.remove('has-file'); }">
+                        </label>
+                        <div class="text-center">
+                            <button type="submit" class="btn-predict">
+                                <i class="bi bi-cpu me-1"></i> Predict AQI
+                            </button>
+                        </div>
+                    </form>
                 </div>
                 {% endif %}
             </div>
@@ -569,31 +688,32 @@
         <!-- Search District -->
         <div class="section" id="section-search">
             <div class="section-header">
-                <h2>Search District</h2>
+                <h2><i class="bi bi-search me-2" style="color:#2563eb;"></i>Search District</h2>
                 <p>Check current AQI for major districts</p>
             </div>
 
-            <div class="card-box">
-                <form method="GET" action="/search/" class="search-row" style="margin-bottom:0;">
-                    <input name="city" list="districts" type="text" placeholder="Enter district name...">
+            <div style="text-align:right;margin-bottom:16px;">
+                <form method="GET" action="/search/" class="search-box d-inline-flex" style="margin:0;">
+                    <input name="city" list="districts" type="text" placeholder="Search district...">
                     <datalist id="districts">
                         {% for card in city_cards %}
-                            <option value="{{ card.city }}">
+                        <option value="{{ card.city }}"></option>
                         {% endfor %}
                     </datalist>
-                    <button type="submit" class="btn-search"><i class="bi bi-search me-1"></i>Search</button>
+                    <button type="submit" class="search-icon"><i class="bi bi-search"></i></button>
                 </form>
             </div>
 
-            <div class="card-box">
-                <div class="card-heading mb-3">Major Districts</div>
+            <div class="card-box" style="padding-top:20px;">
                 <div class="district-grid">
                     {% for card in city_cards %}
                     <div class="district-card">
-                        <div class="d-name">{{ card.city }}</div>
+                        <div class="d-name"><i class="bi bi-geo-alt-fill me-1" style="color:#2563eb;font-size:11px;"></i>{{ card.city }}</div>
                         <div class="d-aqi aqi-{{ card.status_class }}">{{ card.aqi }}</div>
                         <div class="status-badge status-{{ card.status_class }}">{{ card.status }}</div>
-                        <a href="/forecast/{{ card.city|lower }}/" class="btn-forecast-sm">7 Day Forecast</a>
+                        <a href="/forecast/{{ card.city|lower }}/" class="btn-forecast-sm">
+                            <i class="bi bi-calendar-week me-1"></i>7-Day Forecast
+                        </a>
                     </div>
                     {% endfor %}
                 </div>
@@ -603,7 +723,8 @@
 <!-- Prediction History -->
 <div class="section" id="section-history">
     <div class="section-header">
-        <h2> Prediction History</h2>
+        <h2><i class="bi bi-clock-history me-2" style="color:#2563eb;"></i>Prediction History</h2>
+        <p>Your past AQI predictions</p>
     </div>
 
     <div class="card-box">
@@ -611,11 +732,11 @@
         <table class="history-table">
             <thead>
                 <tr>
-                    <th>Image</th>
-                    <th>AQI</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th>Actions</th>
+                    <th style="width:15%;">Image</th>
+                    <th style="width:15%;">AQI</th>
+                    <th style="width:20%;">Status</th>
+                    <th style="width:25%;">Date</th>
+                    <th style="width:22%;text-align:center;">Actions</th>
                 </tr>
             </thead>
 
@@ -648,7 +769,7 @@
                     </td>
 
                     <!-- ACTION BUTTONS -->
-                    <td>
+                    <td style="text-align:center;">
                         <a href="{% url 'prediction_detail' prediction.id %}"
                            class="btn-action btn-blue">
                             <i class="bi bi-eye me-1"></i>View
@@ -679,7 +800,7 @@
         <!-- View Profile -->
         <div class="section" id="section-profile">
             <div class="section-header">
-                <h2>My Profile</h2>
+                <h2><i class="bi bi-person me-2" style="color:#2563eb;"></i>My Profile</h2>
                 <p>Your account information</p>
             </div>
 
@@ -695,6 +816,7 @@
                 <hr class="card-divider">
 
                 <div class="stat-box mb-4">
+                    <i class="bi bi-bar-chart-fill" style="font-size:20px;color:#2563eb;display:block;margin-bottom:6px;"></i>
                     <div class="stat-num">{{ predictions|length|default:"0" }}</div>
                     <div class="stat-label">Total Predictions</div>
                 </div>
@@ -702,7 +824,7 @@
                 <hr class="card-divider">
 
                 <button class="btn btn-primary" onclick="showSection('edit', null)">
-                    <i class="bi bi-pencil me-1"></i>Edit Profile
+                    Edit Profile
                 </button>
             </div>
         </div>
@@ -712,7 +834,7 @@
 <div class="section" id="section-edit">
 
     <div class="section-header">
-        <h2>Edit Profile</h2>
+        <h2><i class="bi bi-pencil-square me-2" style="color:#2563eb;"></i>Edit Profile</h2>
         <p>Update your account details</p>
     </div>
 
@@ -736,7 +858,8 @@
                    id="password1"
                    class="form-input"
                    placeholder="Enter new password"
-                   >
+                   oninput="clearError('pw1-error')">
+            <div id="pw1-error" class="pw-error" style="color:#dc2626;font-size:12px;margin-top:-10px;margin-bottom:10px;display:none;"></div>
             <label class="form-label-sm mt-3">
                 Confirm New Password
             </label>
@@ -746,7 +869,8 @@
                    id="password2"
                    class="form-input"
                    placeholder="Confirm new password"
-                   >
+                   oninput="clearError('pw2-error')">
+            <div id="pw2-error" class="pw-error" style="color:#dc2626;font-size:12px;margin-top:-10px;margin-bottom:10px;display:none;"></div>
             <button type="submit" class="btn btn-primary">Save Changes</button>
 
         </form>
@@ -782,6 +906,11 @@
             if (secEl) secEl.classList.add('active');
             var btn = document.querySelector('.sidebar-link[data-section="' + section + '"]');
             if (btn) btn.classList.add('active');
+            // Remove ?section= from URL so refresh stays on current section
+            if (window.history.replaceState) {
+                var url = window.location.protocol + '//' + window.location.host + window.location.pathname;
+                window.history.replaceState(null, '', url);
+            }
         }
     });
 
@@ -826,17 +955,39 @@
     });
 
 // Password validation
+    function showError(id, msg) {
+        var el = document.getElementById(id);
+        el.textContent = msg;
+        el.style.display = 'block';
+    }
+
+    function clearError(id) {
+        var el = document.getElementById(id);
+        el.textContent = '';
+        el.style.display = 'none';
+    }
+
     function validateForm() {
         var password1 = document.getElementById('password1').value;
         var password2 = document.getElementById('password2').value;
+        clearError('pw1-error');
+        clearError('pw2-error');
 
         if (password1 || password2) {
             if (password1.length < 8) {
-                alert("Password must be at least 8 characters long.");
+                showError('pw1-error', 'Password must be at least 8 characters');
+                return false;
+            }
+            if (/^[0-9]+$/.test(password1)) {
+                showError('pw1-error', 'Password cannot be only numbers');
+                return false;
+            }
+            if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(password1)) {
+                showError('pw1-error', 'Must include at least one special character');
                 return false;
             }
             if (password1 !== password2) {
-                alert("Passwords do not match.");
+                showError('pw2-error', 'Passwords do not match');
                 return false;
             }
         }

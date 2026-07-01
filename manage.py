@@ -1,6 +1,9 @@
-#!/usr/bin/env python
-"""Django's command-line utility for administrative tasks."""
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TF logs
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Disable oneDNN
+os.environ['PYTHONWARNINGS'] = 'ignore::UserWarning:sklearn.*'  # Suppress sklearn warnings
+import warnings
+warnings.filterwarnings('ignore', category=UserWarning, module='sklearn')
 import sys
 
 
