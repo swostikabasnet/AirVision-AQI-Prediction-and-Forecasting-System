@@ -29,7 +29,29 @@
             min-height: 100vh;
         }
 
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 22px;
+            color: #0f172a;
+            text-decoration: none;
+            cursor: text;
+        }
+
         /* ---------- Navbar ---------- */
+        .navbar-modern {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--av-border);
+            padding: 13px 28px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 4px rgba(15,23,42,0.06);
+        }
+
         .search-box { position: relative; width: 240px; }
         .search-box input {
             width: 100%;
@@ -192,21 +214,17 @@
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg" style="background:rgba(255,255,255,0.8); backdrop-filter:blur(12px); border-bottom:1px solid var(--av-border);">
-  <div class="container-fluid d-flex align-items-center justify-content-between">
-    <a class="navbar-brand d-flex align-items-center" href="/" style="color:#1f2d3d; font-weight:700;">
-      <div style="display:flex; align-items:flex-end; gap:3px; margin-right:10px;">
-        <span style="display:block;width:5px;height:14px;border-radius:3px;background:#bfdbfe;"></span>
-        <span style="display:block;width:5px;height:20px;border-radius:3px;background:#93c5fd;"></span>
-        <span style="display:block;width:5px;height:28px;border-radius:3px;background:#2563eb;"></span>
-      </div>
-      AirVision
-    </a>
-    <div class="d-flex align-items-center gap-3">
-        <a href="/" class="btn btn-primary">Home</a>
-        
+<nav class="navbar-modern d-flex align-items-center justify-content-between">
+  <div class="brand">
+    <div style="display:flex; align-items:flex-end; gap:3px;">
+      <span style="display:block;width:5px;height:14px;border-radius:3px;background:#bfdbfe;"></span>
+      <span style="display:block;width:5px;height:20px;border-radius:3px;background:#93c5fd;"></span>
+      <span style="display:block;width:5px;height:28px;border-radius:3px;background:#2563eb;"></span>
     </div>
-    
+    AirVision
+  </div>
+  <div class="d-flex align-items-center gap-3">
+    <a href="{% if user.is_authenticated %}/user/{% else %}/{% endif %}" class="btn btn-primary">{% if user.is_authenticated %}Back to Dashboard{% else %}Home{% endif %}</a>
   </div>
 </nav>
 

@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, render, redirect, reverse
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -25,6 +25,9 @@ def register(request):
             user = form.save(commit=False)
             user.is_admin = False
             user.save()
+            if request.user.is_authenticated and (request.user.is_admin or request.user.is_superuser):
+                messages.success(request, "User created successfully.")
+                return redirect(reverse('admin_dashboard') + '?section=users')
             return redirect('login')
     else:
         form = RegisterForm()

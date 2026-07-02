@@ -1,53 +1,149 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register</title>
-    <!-- Include Bootstrap from CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .card {
-            border-radius: 1rem;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - AirVision</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(800px 500px at 20% -10%, #dbeafe 0%, transparent 55%),
+                  radial-gradient(800px 500px at 100% 5%, #e0e7ff 0%, transparent 50%),
+                  #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .register-card {
+      width: 400px;
+      max-width: 100%;
+      background: #fff;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      padding: 32px 28px 24px;
+    }
+    .brand-wrap {
+      display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 4px; cursor: text;
+    }
+    .brand-bars { display: flex; align-items: flex-end; gap: 3px; }
+    .brand-bars span { display: block; width: 5px; border-radius: 3px; }
+    .brand-bars span:nth-child(1) { height: 14px; background: #bfdbfe; }
+    .brand-bars span:nth-child(2) { height: 20px; background: #93c5fd; }
+    .brand-bars span:nth-child(3) { height: 28px; background: #2563eb; }
+    .brand-text { font-weight: 800; font-size: 22px; color: #0f172a; }
+    .register-subtitle {
+      font-size: 13px; color: #94a3b8; text-align: center; margin-bottom: 20px;
+    }
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block; font-size: 12px; font-weight: 600; color: #64748b;
+      margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .input-wrap { position: relative; }
+    .input-wrap .input-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: #94a3b8; font-size: 15px; pointer-events: none;
+    }
+    .input-wrap .toggle-pass {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      cursor: pointer; color: #94a3b8; font-size: 15px; user-select: none;
+    }
+    .input-wrap .toggle-pass:hover { color: #64748b; }
+    .form-group input {
+      width: 100%; padding: 10px 38px; border-radius: 10px;
+      border: 1px solid #e2e8f0; font-size: 14px; color: #1f2d3d;
+      outline: none; transition: all 0.2s; background: #f8fafc;
+    }
+    .form-group input:focus {
+      border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .form-group input::placeholder { color: #cbd5e1; }
+    .form-group .error { font-size: 11px; color: #dc2626; margin-top: 2px; }
+    .btn-register {
+      width: 100%; padding: 10px; border-radius: 10px; border: none;
+      background: #2563eb; color: #fff; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: background 0.15s; margin-top: 6px;
+    }
+    .btn-register:hover { background: #1d4ed8; }
+    .register-footer {
+      text-align: center; margin-top: 18px; font-size: 13px; color: #64748b;
+    }
+    .register-footer a { color: #2563eb; font-weight: 600; text-decoration: none; }
+    .register-footer a:hover { text-decoration: underline; }
+  </style>
 </head>
-<body class="bg-light">
+<body>
+<div class="register-card">
+  <div class="brand-wrap">
+    <div class="brand-bars"><span></span><span></span><span></span></div>
+    <span class="brand-text">AirVision</span>
+  </div>
+  <p class="register-subtitle">Create an account</p>
 
-<div class="container mt-3">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-lg p-4">
-                <div class="text-center mb-3">
-                    <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:10px;">
-                      <div style="display:flex; align-items:flex-end; gap:3px;">
-                        <span style="display:block;width:5px;height:14px;border-radius:3px;background:#bfdbfe;"></span>
-                        <span style="display:block;width:5px;height:20px;border-radius:3px;background:#93c5fd;"></span>
-                        <span style="display:block;width:5px;height:28px;border-radius:3px;background:#2563eb;"></span>
-                      </div>
-                      <span style="font-weight:800; color:#0f172a; font-size:22px;">AirVision</span>
-                    </div>
-                    <h4 class="mb-2">Create an account</h4>
-                    
-                </div>
+  <form method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div style="font-size:12px;color:#dc2626;margin-bottom:10px;">{{ form.non_field_errors }}</div>
+    {% endif %}
 
-                <form method="post">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Register</button>
-                    </div>
-                </form>
-
-                <p class="mt-3 text-center" style="color:#64748b;">
-                    Already have an account?
-                    <a href="{% url 'login' %}">Login here</a>
-                </p>
-            </div>
-        </div>
+    <div class="form-group">
+      <label>Username</label>
+      <div class="input-wrap">
+        <i class="bi bi-person input-icon"></i>
+        <input type="text" name="username" placeholder="Choose a username" value="{{ form.username.value|default:'' }}" required>
+      </div>
+      {% for err in form.username.errors %}<div class="error">{{ err }}</div>{% endfor %}
     </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <div class="input-wrap">
+        <i class="bi bi-lock input-icon"></i>
+        <input type="password" name="password1" id="regPassword1" placeholder="Create a password" autocomplete="new-password" required>
+        <span class="toggle-pass" onclick="togglePass1()"><i class="bi bi-eye-slash" id="eye1"></i></span>
+      </div>
+      {% for err in form.password1.errors %}<div class="error">{{ err }}</div>{% endfor %}
+    </div>
+
+    <div class="form-group">
+      <label>Confirm Password</label>
+      <div class="input-wrap">
+        <i class="bi bi-lock-fill input-icon"></i>
+        <input type="password" name="password2" id="regPassword2" placeholder="Re-enter password" required>
+        <span class="toggle-pass" onclick="togglePass2()"><i class="bi bi-eye-slash" id="eye2"></i></span>
+      </div>
+      {% for err in form.password2.errors %}<div class="error">{{ err }}</div>{% endfor %}
+    </div>
+
+    <button class="btn-register" type="submit"> Register</button>
+  </form>
+
+  <p class="register-footer">
+    Already have an account? <a href="{% url 'login' %}">Login here</a>
+  </p>
 </div>
 
+<script>
+  function togglePass1() {
+    var p = document.getElementById('regPassword1');
+    var e = document.getElementById('eye1');
+    if (p.type === 'password') { p.type = 'text'; e.className = 'bi bi-eye'; }
+    else { p.type = 'password'; e.className = 'bi bi-eye-slash'; }
+  }
+  function togglePass2() {
+    var p = document.getElementById('regPassword2');
+    var e = document.getElementById('eye2');
+    if (p.type === 'password') { p.type = 'text'; e.className = 'bi bi-eye'; }
+    else { p.type = 'password'; e.className = 'bi bi-eye-slash'; }
+  }
+</script>
 </body>
 </html>

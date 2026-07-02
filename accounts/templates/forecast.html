@@ -18,14 +18,26 @@
         }
 
         /* Navbar */
-        .navbar {
+        .navbar-modern {
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid #e2e8f0;
-            padding: 14px 0;
+            padding: 13px 28px;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
+            box-shadow: 0 1px 4px rgba(15,23,42,0.06);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 22px;
+            color: #0f172a;
+            text-decoration: none;
+            cursor: text;
         }
 
         /* Page Title */
@@ -210,17 +222,16 @@
 <body>
 
 <!-- Navbar -->
-<nav class="navbar">
-    <div class="container-fluid d-flex align-items-center">
-        <a class="navbar-brand d-flex align-items-center" href="/" style="color:#0f172a; font-weight:800; font-size:22px; text-decoration:none;">
-            <div style="display:flex; align-items:flex-end; gap:3px; margin-right:10px;">
-                <span style="display:block;width:5px;height:14px;border-radius:3px;background:#bfdbfe;"></span>
-                <span style="display:block;width:5px;height:20px;border-radius:3px;background:#93c5fd;"></span>
-                <span style="display:block;width:5px;height:28px;border-radius:3px;background:#2563eb;"></span>
-            </div>
-            AirVision
-        </a>
-        <div class="flex-grow-1"></div>
+<nav class="navbar-modern d-flex align-items-center justify-content-between">
+    <div class="brand">
+        <div style="display:flex; align-items:flex-end; gap:3px;">
+            <span style="display:block;width:5px;height:14px;border-radius:3px;background:#bfdbfe;"></span>
+            <span style="display:block;width:5px;height:20px;border-radius:3px;background:#93c5fd;"></span>
+            <span style="display:block;width:5px;height:28px;border-radius:3px;background:#2563eb;"></span>
+        </div>
+        AirVision
+    </div>
+    <div>
         <a href="/aqi/{{ city|lower }}/" class="btn btn-primary">View AQI Detail</a>
     </div>
 </nav>

@@ -42,6 +42,7 @@
             font-size: 22px;
             color: #0f172a;
             text-decoration: none;
+            cursor: text;
         }
 
         .admin-badge {
@@ -420,13 +421,10 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #f1f5f9;
+            padding: 10px 0;
         }
-
-        .district-row:last-child { border-bottom: none; }
-
-        .district-name { font-size: 14px; font-weight: 600; color: #1f2d3d; }
+        .district-row + .district-row { border-top: 1px solid #f1f5f9; }
+        .district-row-left { display: flex; align-items: center; gap: 10px; }
 
         /* Search filter */
         .filter-row {
@@ -453,14 +451,14 @@
 <!-- Navbar -->
 <nav class="navbar-modern">
     <div class="d-flex align-items-center gap-3">
-        <a href="/" class="brand">
+        <div class="brand">
             <div style="display:flex;align-items:flex-end;gap:3px;">
                 <span style="display:block;width:5px;height:14px;border-radius:3px;background:#bfdbfe;"></span>
                 <span style="display:block;width:5px;height:20px;border-radius:3px;background:#93c5fd;"></span>
                 <span style="display:block;width:5px;height:28px;border-radius:3px;background:#2563eb;"></span>
             </div>
             AirVision
-        </a>
+        </div>
         
     </div>
 
@@ -495,6 +493,14 @@
     <!-- Main -->
     <div class="main-content">
 
+        {% if messages %}
+            {% for message in messages %}
+                <div style="padding:12px 18px;border-radius:10px;background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;margin-bottom:16px;font-size:13px;font-weight:600;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
         <!-- ── OVERVIEW ── -->
         <div class="section active" id="section-overview">
             <div class="section-header">
@@ -527,23 +533,23 @@
 
             <!-- District AQI Summary -->
             <div class="card-box">
-                <div class="card-heading">District-wise AQI Summary</div>
-                
+                <div class="card-heading"><i class="bi bi-map me-1" style="color:#2563eb;"></i>District-wise AQI Summary</div>
+                <p style="font-size:12px;color:#94a3b8;margin-bottom:8px;">AQI from forecast model for each district</p>
 
                 {% for item in district_data %}
                 <div class="district-row">
-                    <div class="district-name">{{ item.district }}</div>
-                    <div class="d-flex align-items-center gap-3">
-                        <span style="font-size:20px;font-weight:700;" class="aqi-{{ item.status|lower }}">{{ item.aqi }}</span>
-                        <span class="status-badge status-{{ item.status|lower }}">{{ item.status }}</span>
+                    <div class="district-row-left">
+                        <i class="bi bi-geo-alt-fill" style="font-size:15px;color:{% if item.status == 'Good' %}#16a34a{% elif item.status == 'Moderate' %}#d97706{% else %}#dc2626{% endif %};"></i>
+                        <span style="font-size:14px;font-weight:600;color:#1f2d3d;">{{ item.district }}</span>
+                    </div>
+                    <div class="district-row-left">
+                        <span style="font-size:20px;font-weight:700;{% if item.status == 'Good' %}color:#16a34a{% elif item.status == 'Moderate' %}color:#d97706{% else %}color:#dc2626{% endif %};">{{ item.aqi }}</span>
+                        <span style="font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px;{% if item.status == 'Good' %}background:#f0fdf4;color:#16a34a{% elif item.status == 'Moderate' %}background:#fffbeb;color:#d97706{% else %}background:#fff1f2;color:#dc2626{% endif %};">{{ item.status }}</span>
                     </div>
                 </div>
                 {% empty %}
-                <div class="district-row">
-                    <div class="district-name">No model districts available</div>
-                    <div class="d-flex align-items-center gap-3">
-                        <span style="font-size:14px;color:#64748b;">Please add a trained district or check model configuration.</span>
-                    </div>
+                <div style="text-align:center;padding:16px;color:#94a3b8;font-size:13px;">
+                    <i class="bi bi-exclamation-circle"></i> No model districts available
                 </div>
                 {% endfor %}
             </div>
@@ -553,15 +559,8 @@
 <div class="section" id="section-aqi-data">
     <div class="section-header">
         <h2><i class="bi bi-database me-2" style="color:#16a34a;"></i>Manual AQI Data</h2>
+        <p>View and manage manually entered AQI records</p>
     </div>
-
-    {% if messages %}
-        {% for message in messages %}
-            <div class="card-box" style="border-color:#d1fae5;color:#166534;">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
 
     <div class="card-box" style="padding:0;overflow:hidden;">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
@@ -682,6 +681,12 @@
     <div class="section-header">
         <h2><i class="bi bi-people me-2" style="color:#7c3aed;"></i>Users</h2>
         <p>Manage registered users</p>
+    </div>
+
+    <div style="margin-bottom:16px;display:flex;justify-content:flex-end;">
+        <a href="{% url 'register' %}" class="btn-primary-solid" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;font-size:13px;">
+            <i class="bi bi-person-plus"></i> Add User
+        </a>
     </div>
 
     <div class="card-box">
@@ -820,6 +825,16 @@
         document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
         document.getElementById('section-' + name).classList.add('active');
         if (btn) btn.classList.add('active');
+    }
+
+    // Auto-switch section from URL param ?section=xxx
+    var params = new URLSearchParams(window.location.search);
+    var section = params.get('section');
+    if (section) {
+        var targetBtn = document.querySelector('.sidebar-link[onclick*="' + section + '"]');
+        if (targetBtn) showSection(section, targetBtn);
+        // Clean URL so refresh doesn't stay on same section
+        history.replaceState(null, '', window.location.pathname);
     }
 
     // Real dates for sample rows

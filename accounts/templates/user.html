@@ -41,6 +41,7 @@
             font-size: 22px;
             color: #0f172a;
             text-decoration: none;
+            cursor: text;
         }
 
         .welcome-text { font-size: 14px; color: #64748b; }
@@ -575,14 +576,14 @@
 
 <!-- Navbar -->
 <nav class="navbar-modern">
-    <a href="/" class="brand">
+    <div class="brand">
         <div style="display:flex; align-items:flex-end; gap:3px;">
             <span style="display:block;width:5px;height:14px;border-radius:3px;background:#bfdbfe;"></span>
             <span style="display:block;width:5px;height:20px;border-radius:3px;background:#93c5fd;"></span>
             <span style="display:block;width:5px;height:28px;border-radius:3px;background:#2563eb;"></span>
         </div>
         AirVision
-    </a>
+    </div>
     <div class="d-flex align-items-center gap-3">
         <span class="welcome-text">Welcome back, <strong>{{ request.user.username }}</strong></span>
         <a href="/logout/" class="btn btn-primary">Logout</a>

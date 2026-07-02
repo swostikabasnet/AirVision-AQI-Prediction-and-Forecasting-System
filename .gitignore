@@ -20,13 +20,10 @@ static/
 # VS Code
 .vscode/
 
-# Excel/Data
-*.xlsx
-*.csv
+
 
 # ML Models
 models/
 *.pkl
 
-# Notebook file
-*.ipynb
+.ipynb_checkpoints/

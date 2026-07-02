@@ -248,7 +248,7 @@ def admin_dashboard(request):
             messages.success(request, 'AQI record added successfully.')
             return redirect('admin_dashboard')
             
-    users = CustomUser.objects.annotate(prediction_count=Count('prediction')).all()
+    users = CustomUser.objects.annotate(prediction_count=Count('prediction')).order_by('-date_joined')
     total_users = users.count()
     total_admins = CustomUser.objects.filter(is_admin=True).count()
     city_cards = build_city_cards()
@@ -306,14 +306,16 @@ def delete_user(request, id):
         return redirect('user_dashboard')
     user = get_object_or_404(User, id=id)
     user.delete()
-    return redirect('admin_dashboard')
+    messages.success(request, "User deleted successfully.")
+    return redirect(reverse('admin_dashboard') + '?section=users')
 
 @login_required
 def delete_prediction(request, id):
     prediction = get_object_or_404(Prediction, id=id)
     if request.user.is_admin or request.user.is_superuser:
         prediction.delete()
-        return redirect('admin_dashboard')
+        messages.success(request, "Prediction deleted successfully.")
+        return redirect(reverse('admin_dashboard') + '?section=logs')
     if prediction.user == request.user:
         prediction.delete()
         messages.success(request, "Prediction deleted successfully.")
