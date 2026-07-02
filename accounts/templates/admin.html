@@ -425,6 +425,16 @@
         }
         .district-row + .district-row { border-top: 1px solid #f1f5f9; }
         .district-row-left { display: flex; align-items: center; gap: 10px; }
+        .district-icon-good { color: #16a34a; }
+        .district-icon-moderate { color: #d97706; }
+        .district-icon-unhealthy { color: #dc2626; }
+        .district-aqi-good { color: #16a34a; }
+        .district-aqi-moderate { color: #d97706; }
+        .district-aqi-unhealthy { color: #dc2626; }
+        .district-pill-good { background: #f0fdf4; color: #16a34a; }
+        .district-pill-moderate { background: #fffbeb; color: #d97706; }
+        .district-pill-unhealthy { background: #fff1f2; color: #dc2626; }
+        .district-name { font-size: 14px; font-weight: 600; color: #1f2d3d; }
 
         /* Search filter */
         .filter-row {
@@ -539,12 +549,12 @@
                 {% for item in district_data %}
                 <div class="district-row">
                     <div class="district-row-left">
-                        <i class="bi bi-geo-alt-fill" style="font-size:15px;color:{% if item.status == 'Good' %}#16a34a{% elif item.status == 'Moderate' %}#d97706{% else %}#dc2626{% endif %};"></i>
-                        <span style="font-size:14px;font-weight:600;color:#1f2d3d;">{{ item.district }}</span>
+                        <i class="bi bi-geo-alt-fill district-icon-{{ item.status|lower }}"></i>
+                        <span class="district-name">{{ item.district }}</span>
                     </div>
                     <div class="district-row-left">
-                        <span style="font-size:20px;font-weight:700;{% if item.status == 'Good' %}color:#16a34a{% elif item.status == 'Moderate' %}color:#d97706{% else %}color:#dc2626{% endif %};">{{ item.aqi }}</span>
-                        <span style="font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px;{% if item.status == 'Good' %}background:#f0fdf4;color:#16a34a{% elif item.status == 'Moderate' %}background:#fffbeb;color:#d97706{% else %}background:#fff1f2;color:#dc2626{% endif %};">{{ item.status }}</span>
+                        <span class="district-aqi-{{ item.status|lower }}" style="font-size:20px;font-weight:700;">{{ item.aqi }}</span>
+                        <span class="district-pill-{{ item.status|lower }}" style="font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px;">{{ item.status }}</span>
                     </div>
                 </div>
                 {% empty %}
